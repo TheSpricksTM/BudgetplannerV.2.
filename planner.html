@@ -1,0 +1,1605 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+<meta name="description" content="Persoonlijke budgetplanner met grafieken, dark mode, spaardoelen en prognose. Gemaakt door Aiman Mahgoub."/>
+<meta name="author" content="Aiman Mahgoub"/>
+<meta name="theme-color" content="#06d6a0"/>
+
+<!-- Open Graph (voor social media previews) -->
+<meta property="og:title" content="BudgetPlanner — Aiman Mahgoub"/>
+<meta property="og:description" content="Interactieve budgetplanner met grafieken, dark mode en spaardoelen."/>
+<meta property="og:type" content="website"/>
+<meta property="og:locale" content="nl_NL"/>
+
+<!-- Favicon als emoji -->
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💶</text></svg>"/>
+
+<title>BudgetPlanner — Aiman Mahgoub</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+/* ═══════════════════════════════════════════════════
+   CSS VARIABLES
+═══════════════════════════════════════════════════ */
+:root {
+  --a:      #06d6a0;
+  --a2:     #059669;
+  --a3:     #34d399;
+  --aRgb:   6,214,160;
+  --bg:     #f0f4f8;
+  --bg2:    #e2e8f0;
+  --bg3:    #cbd5e1;
+  --sur:    #ffffff;
+  --sur2:   #f8fafc;
+  --sur3:   #f1f5f9;
+  --t1:     #0f172a;
+  --t2:     #334155;
+  --t3:     #64748b;
+  --t4:     #94a3b8;
+  --brd:    rgba(148,163,184,.18);
+  --brd2:   rgba(148,163,184,.32);
+  --pos:    #10b981;
+  --neg:    #f43f5e;
+  --warn:   #f59e0b;
+  --info:   #3b82f6;
+  --sh:     0 1px 3px rgba(0,0,0,.06), 0 4px 16px rgba(0,0,0,.06);
+  --sh2:    0 2px 8px rgba(0,0,0,.08), 0 8px 32px rgba(0,0,0,.08);
+  --r:      14px;
+  --r2:     10px;
+  --r3:     8px;
+  --nb-h:   56px;
+  --sidebar-w: 240px;
+}
+[data-theme=dark] {
+  --bg:     #070d1a;
+  --bg2:    #0d1526;
+  --bg3:    #162035;
+  --sur:    #111c30;
+  --sur2:   #162035;
+  --sur3:   #1e2d45;
+  --t1:     #f1f5f9;
+  --t2:     #cbd5e1;
+  --t3:     #94a3b8;
+  --t4:     #475569;
+  --brd:    rgba(99,130,165,.15);
+  --brd2:   rgba(99,130,165,.28);
+  --sh:     0 1px 3px rgba(0,0,0,.3), 0 4px 16px rgba(0,0,0,.3);
+  --sh2:    0 2px 8px rgba(0,0,0,.4), 0 8px 32px rgba(0,0,0,.35);
+}
+
+/* ═══════════════════════════════════════════════════
+   RESET & BASE
+═══════════════════════════════════════════════════ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;-webkit-tap-highlight-color:transparent}
+body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--t1);min-height:100vh;transition:background .25s,color .25s;overflow-x:hidden}
+input,button,select,textarea{font-family:inherit}
+button{cursor:pointer}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--a);border-radius:99px;opacity:.6}
+
+/* ═══════════════════════════════════════════════════
+   LAYOUT SHELL
+═══════════════════════════════════════════════════ */
+.shell{display:flex;height:100vh;overflow:hidden}
+
+/* ═══════════════════════════════════════════════════
+   SIDEBAR
+═══════════════════════════════════════════════════ */
+.sidebar{
+  width:var(--sidebar-w);flex-shrink:0;
+  background:var(--sur);
+  border-right:1px solid var(--brd);
+  display:flex;flex-direction:column;
+  height:100vh;overflow-y:auto;
+  transition:transform .3s cubic-bezier(.4,0,.2,1),background .25s;
+  position:relative;z-index:200;
+}
+.sb-logo{
+  padding:22px 20px 18px;
+  border-bottom:1px solid var(--brd);
+  display:flex;align-items:center;gap:10px;
+}
+.sb-logo-mark{
+  width:36px;height:36px;border-radius:10px;
+  background:linear-gradient(135deg,var(--a),var(--a2));
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;flex-shrink:0;box-shadow:0 4px 12px rgba(var(--aRgb),.35);
+}
+.sb-logo-text h1{font-size:15px;font-weight:800;letter-spacing:-.3px;color:var(--t1);line-height:1.1}
+.sb-logo-text p{font-size:10.5px;color:var(--t3);margin-top:1px;font-weight:400}
+
+.sb-nav{padding:12px 10px;flex:1}
+.sb-section-label{
+  font-size:10px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;
+  color:var(--t4);padding:0 10px;margin:14px 0 4px;
+}
+.nav-btn{
+  display:flex;align-items:center;gap:9px;width:100%;
+  padding:9px 10px;border-radius:var(--r2);
+  border:none;background:transparent;color:var(--t2);
+  font-size:13.5px;font-weight:500;text-align:left;
+  transition:all .18s;position:relative;
+}
+.nav-btn:hover{background:var(--bg);color:var(--t1)}
+.nav-btn.active{background:linear-gradient(135deg,rgba(var(--aRgb),.15),rgba(var(--aRgb),.07));color:var(--a);font-weight:600}
+.nav-btn.active::before{
+  content:'';position:absolute;left:0;top:20%;bottom:20%;
+  width:3px;border-radius:0 99px 99px 0;background:var(--a);
+}
+.nav-icon{font-size:16px;width:22px;text-align:center;flex-shrink:0}
+
+.sb-bottom{
+  padding:14px;border-top:1px solid var(--brd);
+  display:flex;flex-direction:column;gap:8px;
+}
+.theme-row{display:flex;gap:4px;background:var(--bg2);border-radius:99px;padding:3px}
+.theme-btn{
+  flex:1;padding:5px 8px;border-radius:99px;border:none;background:transparent;
+  font-size:11.5px;font-weight:600;color:var(--t3);transition:all .18s;
+}
+.theme-btn.on{background:var(--sur);color:var(--t1);box-shadow:0 1px 3px rgba(0,0,0,.1)}
+
+/* ═══════════════════════════════════════════════════
+   MOBILE NAV OVERLAY
+═══════════════════════════════════════════════════ */
+.mob-overlay{
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:190;
+  opacity:0;transition:opacity .25s;pointer-events:none;
+}
+.mob-overlay.show{opacity:1;pointer-events:all}
+
+/* ═══════════════════════════════════════════════════
+   MAIN AREA
+═══════════════════════════════════════════════════ */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+
+/* ═══════════════════════════════════════════════════
+   TOP BAR
+═══════════════════════════════════════════════════ */
+.topbar{
+  height:var(--nb-h);flex-shrink:0;
+  background:var(--sur);border-bottom:1px solid var(--brd);
+  display:flex;align-items:center;gap:10px;padding:0 20px;
+  position:sticky;top:0;z-index:100;
+  transition:background .25s;
+}
+.topbar-menu{
+  display:none;background:none;border:none;padding:4px;
+  color:var(--t2);font-size:20px;border-radius:var(--r3);
+}
+.topbar-menu:hover{background:var(--bg2)}
+.topbar-title{font-size:15px;font-weight:700;color:var(--t1);flex:1;letter-spacing:-.3px}
+.topbar-year{
+  background:var(--bg2);border:1.5px solid var(--brd2);border-radius:var(--r3);
+  color:var(--t1);font-family:'Outfit',sans-serif;font-size:13px;font-weight:700;
+  padding:5px 9px;outline:none;transition:border-color .18s;
+}
+.topbar-year:focus{border-color:var(--a)}
+.btn{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:7px 14px;border-radius:99px;border:none;
+  font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;
+  transition:all .18s;white-space:nowrap;
+}
+.btn-a{background:var(--a);color:#fff}
+.btn-a:hover{background:var(--a2);transform:translateY(-1px);box-shadow:0 4px 14px rgba(var(--aRgb),.4)}
+.btn-g{background:var(--bg2);color:var(--t2)}
+.btn-g:hover{background:var(--bg3);color:var(--t1)}
+.btn-sm{padding:5px 10px;font-size:12px}
+.btn-icon{width:32px;height:32px;padding:0;justify-content:center;border-radius:var(--r3);font-size:15px}
+
+/* ═══════════════════════════════════════════════════
+   SCROLL AREA
+═══════════════════════════════════════════════════ */
+.scroll{flex:1;overflow-y:auto;overflow-x:hidden}
+.inner{padding:20px;max-width:1360px;margin:0 auto}
+
+/* ═══════════════════════════════════════════════════
+   PAGES
+═══════════════════════════════════════════════════ */
+.page{display:none}
+.page.on{display:block}
+.pg-head{margin-bottom:20px}
+.pg-title{font-size:22px;font-weight:800;letter-spacing:-.5px;color:var(--t1)}
+.pg-sub{font-size:13px;color:var(--t3);margin-top:3px}
+
+/* ═══════════════════════════════════════════════════
+   CARDS
+═══════════════════════════════════════════════════ */
+.card{
+  background:var(--sur);border-radius:var(--r);
+  border:1px solid var(--brd);box-shadow:var(--sh);
+  transition:background .25s,border-color .25s;overflow:hidden;
+}
+.card-h{padding:16px 18px 0;display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+.card-t{font-size:13.5px;font-weight:700;color:var(--t1);letter-spacing:-.2px}
+.card-s{font-size:11.5px;color:var(--t3);margin-top:2px}
+.card-b{padding:16px 18px 18px}
+.card-b-np{padding:0}
+
+/* ═══════════════════════════════════════════════════
+   KPI GRID
+═══════════════════════════════════════════════════ */
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}
+.kpi{
+  background:var(--sur);border-radius:var(--r);
+  border:1px solid var(--brd);box-shadow:var(--sh);
+  padding:18px 16px 16px;position:relative;overflow:hidden;
+  transition:all .25s;
+}
+.kpi::after{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:var(--kc,var(--a));border-radius:var(--r) var(--r) 0 0;
+}
+.kpi-ico{font-size:22px;margin-bottom:8px}
+.kpi-lbl{font-size:10.5px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--t4);margin-bottom:5px}
+.kpi-val{font-size:22px;font-weight:800;letter-spacing:-1px;color:var(--t1);font-variant-numeric:tabular-nums}
+.kpi-sub{font-size:11.5px;color:var(--t3);margin-top:3px}
+.kpi-sub.up{color:var(--pos)}
+.kpi-sub.dn{color:var(--neg)}
+
+/* ═══════════════════════════════════════════════════
+   GRID LAYOUTS
+═══════════════════════════════════════════════════ */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:16px}
+.g21{display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-bottom:16px}
+.span2{grid-column:span 2}
+.mb16{margin-bottom:16px}
+.mb8{margin-bottom:8px}
+.cw{height:260px;position:relative}
+.cw-sm{height:200px;position:relative}
+.cw-lg{height:320px;position:relative}
+
+/* ═══════════════════════════════════════════════════
+   NET BANNER
+═══════════════════════════════════════════════════ */
+.net-banner{
+  border-radius:var(--r);padding:18px 20px;
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  border:1px solid;margin-bottom:18px;
+  transition:all .3s;
+}
+.net-pos{background:linear-gradient(135deg,rgba(16,185,129,.08),rgba(6,214,160,.05));border-color:rgba(16,185,129,.2)}
+.net-neg{background:linear-gradient(135deg,rgba(244,63,94,.08),rgba(239,68,68,.05));border-color:rgba(244,63,94,.2)}
+.net-lbl{font-size:10.5px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;margin-bottom:4px}
+.net-val{font-size:28px;font-weight:900;letter-spacing:-1.5px;font-variant-numeric:tabular-nums}
+.net-pos .net-val{color:var(--pos)}
+.net-neg .net-val{color:var(--neg)}
+.net-detail{font-size:12px;color:var(--t3);margin-top:3px}
+.net-icon{font-size:44px;opacity:.12;flex-shrink:0}
+
+/* ═══════════════════════════════════════════════════
+   PROGRESS
+═══════════════════════════════════════════════════ */
+.prog-list{display:flex;flex-direction:column;gap:12px}
+.prog-meta{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:5px}
+.prog-name{font-size:13px;font-weight:500;color:var(--t1)}
+.prog-nums{font-size:11.5px;color:var(--t3);font-variant-numeric:tabular-nums}
+.prog-track{height:6px;background:var(--bg2);border-radius:99px;overflow:hidden}
+.prog-fill{height:100%;border-radius:99px;transition:width 1.2s cubic-bezier(.4,0,.2,1)}
+
+/* ═══════════════════════════════════════════════════
+   BUDGET TABLE (INVOER)
+═══════════════════════════════════════════════════ */
+.tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.btbl{width:100%;border-collapse:collapse;font-size:12.5px}
+.btbl th{
+  font-size:10.5px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;
+  color:var(--t4);padding:8px 10px;border-bottom:2px solid var(--brd2);
+  text-align:right;white-space:nowrap;position:sticky;top:0;background:var(--sur);z-index:10;
+}
+.btbl th:first-child{text-align:left;min-width:170px}
+.btbl td{padding:7px 10px;border-bottom:1px solid var(--brd);color:var(--t2);text-align:right;vertical-align:middle}
+.btbl td:first-child{text-align:left;color:var(--t1);font-weight:500}
+.btbl tr:hover td{background:var(--sur2)}
+.sec-row td{
+  background:var(--bg2)!important;
+  font-size:10.5px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;
+  color:var(--t3);padding:5px 10px;
+}
+.tot-row td{
+  font-weight:700;color:var(--t1)!important;
+  background:var(--sur3)!important;
+  border-top:2px solid var(--brd2);font-size:13px;
+}
+.gnd-row td{
+  font-weight:800;font-size:13.5px;
+  background:linear-gradient(90deg,rgba(var(--aRgb),.12),rgba(var(--aRgb),.06))!important;
+  color:var(--a)!important;border-top:2px solid rgba(var(--aRgb),.3);
+}
+.cell-inp{
+  background:transparent;border:none;outline:none;
+  color:var(--info);font-family:'Outfit',sans-serif;font-size:12.5px;font-weight:500;
+  text-align:right;width:72px;padding:3px 4px;
+  border-bottom:1.5px dashed rgba(var(--aRgb),.4);
+  transition:all .18s;border-radius:0;
+}
+.cell-inp:focus{
+  color:var(--a);border-bottom-color:var(--a);
+  background:rgba(var(--aRgb),.06);border-radius:4px;
+  width:82px;
+}
+.cell-inp::-webkit-outer-spin-button,.cell-inp::-webkit-inner-spin-button{-webkit-appearance:none}
+.tot-cell{font-weight:700;color:var(--t1)!important;font-variant-numeric:tabular-nums}
+.pos-cell{color:var(--pos)!important;font-weight:700}
+.neg-cell{color:var(--neg)!important;font-weight:700}
+
+/* ═══════════════════════════════════════════════════
+   EDIT MODE — add/remove rows
+═══════════════════════════════════════════════════ */
+.edit-bar{
+  display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+  padding:12px 16px;background:var(--sur3);border-bottom:1px solid var(--brd);
+}
+.edit-bar-label{font-size:12px;font-weight:600;color:var(--t3);margin-right:4px}
+.row-actions{display:flex;gap:6px;margin-left:auto}
+.btn-del{
+  background:rgba(244,63,94,.1);color:var(--neg);border:none;
+  border-radius:6px;width:24px;height:24px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;transition:all .18s;cursor:pointer;flex-shrink:0;
+}
+.btn-del:hover{background:rgba(244,63,94,.2)}
+.btn-add-row{
+  display:flex;align-items:center;gap:5px;width:100%;
+  padding:7px 10px;border-radius:var(--r3);
+  border:1.5px dashed var(--brd2);background:transparent;
+  color:var(--t3);font-size:12px;font-weight:500;
+  transition:all .18s;
+}
+.btn-add-row:hover{border-color:var(--a);color:var(--a);background:rgba(var(--aRgb),.05)}
+.cat-lbl-input{
+  background:transparent;border:none;outline:none;
+  font-family:'Outfit',sans-serif;font-size:12.5px;font-weight:500;
+  color:var(--t1);width:100%;min-width:130px;padding:2px;
+  border-bottom:1.5px dashed transparent;
+  transition:border-color .18s;
+}
+.cat-lbl-input:hover{border-bottom-color:rgba(var(--aRgb),.3)}
+.cat-lbl-input:focus{border-bottom-color:var(--a);outline:none}
+.edit-mode-on .cat-lbl-input{border-bottom-color:rgba(var(--aRgb),.25)}
+.edit-mode-on .btn-del{opacity:1;pointer-events:all}
+.btn-del{opacity:0;pointer-events:none}
+
+/* ═══════════════════════════════════════════════════
+   MONTH TABS
+═══════════════════════════════════════════════════ */
+.m-tabs{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:16px;overflow-x:auto;padding-bottom:2px}
+.m-tab{
+  padding:5px 12px;border-radius:99px;
+  font-size:12.5px;font-weight:600;
+  cursor:pointer;border:1.5px solid var(--brd2);
+  background:transparent;color:var(--t3);
+  transition:all .18s;flex-shrink:0;
+}
+.m-tab.on{background:var(--a);border-color:var(--a);color:#fff}
+.m-tab:hover:not(.on){border-color:var(--a);color:var(--a)}
+
+/* ═══════════════════════════════════════════════════
+   SETTINGS
+═══════════════════════════════════════════════════ */
+.set-row{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:14px 0;border-bottom:1px solid var(--brd);
+}
+.set-row:last-child{border:none}
+.set-info h4{font-size:13.5px;font-weight:600;color:var(--t1)}
+.set-info p{font-size:12px;color:var(--t3);margin-top:2px}
+.toggle{position:relative;width:42px;height:23px;flex-shrink:0}
+.toggle input{display:none}
+.tog-sl{
+  position:absolute;inset:0;background:var(--bg3);border-radius:99px;
+  cursor:pointer;transition:.25s;
+}
+.tog-sl::before{
+  content:'';position:absolute;width:17px;height:17px;
+  left:3px;top:3px;background:#fff;border-radius:50%;
+  transition:.25s;box-shadow:0 1px 3px rgba(0,0,0,.2);
+}
+.toggle input:checked+.tog-sl{background:var(--a)}
+.toggle input:checked+.tog-sl::before{transform:translateX(19px)}
+
+.color-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
+.clr-item label{font-size:11px;color:var(--t3);display:block;margin-bottom:5px;font-weight:500}
+.clr-swatch{
+  width:100%;height:40px;border-radius:var(--r3);
+  border:2px solid var(--brd2);cursor:pointer;
+  overflow:hidden;position:relative;transition:transform .18s;
+}
+.clr-swatch:hover{transform:scale(1.05);box-shadow:0 4px 14px rgba(0,0,0,.15)}
+.clr-swatch input[type=color]{position:absolute;inset:-6px;width:calc(100%+12px);height:calc(100%+12px);border:none;cursor:pointer;opacity:0}
+.clr-prev{width:100%;height:100%;transition:background .1s}
+
+.presets{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+.preset{
+  width:30px;height:30px;border-radius:50%;cursor:pointer;
+  border:3px solid transparent;transition:all .2s;
+}
+.preset:hover,.preset.on{transform:scale(1.18);border-color:var(--t1)}
+
+/* ═══════════════════════════════════════════════════
+   DOELEN (Goals) PAGE
+═══════════════════════════════════════════════════ */
+.goal-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:18px}
+.goal-card{
+  background:var(--sur);border:1px solid var(--brd);border-radius:var(--r);
+  box-shadow:var(--sh);padding:18px;position:relative;overflow:hidden;
+}
+.goal-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:var(--gc,var(--a));
+}
+.goal-name{font-size:13px;font-weight:600;color:var(--t1);margin-bottom:6px}
+.goal-target{font-size:11px;color:var(--t3);margin-bottom:10px}
+.goal-val{font-size:20px;font-weight:800;letter-spacing:-1px;color:var(--t1);margin-bottom:8px}
+.goal-pct{font-size:12px;font-weight:600;margin-bottom:8px}
+.goal-track{height:8px;background:var(--bg2);border-radius:99px;overflow:hidden}
+.goal-fill{height:100%;border-radius:99px;background:var(--gc,var(--a));transition:width 1.2s cubic-bezier(.4,0,.2,1)}
+.btn-add-goal{
+  display:flex;align-items:center;gap:8px;
+  padding:14px;border-radius:var(--r);
+  border:2px dashed var(--brd2);background:transparent;
+  color:var(--t3);font-size:13px;font-weight:500;
+  transition:all .18s;width:100%;justify-content:center;
+}
+.btn-add-goal:hover{border-color:var(--a);color:var(--a);background:rgba(var(--aRgb),.04)}
+
+/* ═══════════════════════════════════════════════════
+   MODAL
+═══════════════════════════════════════════════════ */
+.modal-bg{
+  position:fixed;inset:0;background:rgba(0,0,0,.55);
+  z-index:500;display:flex;align-items:center;justify-content:center;
+  padding:20px;opacity:0;transition:opacity .25s;pointer-events:none;
+  backdrop-filter:blur(4px);
+}
+.modal-bg.show{opacity:1;pointer-events:all}
+.modal{
+  background:var(--sur);border-radius:var(--r);box-shadow:var(--sh2);
+  padding:24px;width:100%;max-width:420px;
+  transform:scale(.96) translateY(8px);transition:transform .25s;
+}
+.modal-bg.show .modal{transform:scale(1) translateY(0)}
+.modal-title{font-size:16px;font-weight:800;color:var(--t1);margin-bottom:4px}
+.modal-sub{font-size:12px;color:var(--t3);margin-bottom:18px}
+.form-group{margin-bottom:14px}
+.form-label{font-size:12px;font-weight:600;color:var(--t2);display:block;margin-bottom:5px}
+.form-inp{
+  width:100%;padding:9px 12px;border-radius:var(--r3);
+  border:1.5px solid var(--brd2);background:var(--bg2);
+  color:var(--t1);font-family:'Outfit',sans-serif;font-size:13px;
+  outline:none;transition:border-color .18s;
+}
+.form-inp:focus{border-color:var(--a);background:var(--sur)}
+.modal-btns{display:flex;gap:8px;justify-content:flex-end;margin-top:20px}
+.divider{height:1px;background:var(--brd);margin:16px 0}
+
+/* ═══════════════════════════════════════════════════
+   TOAST
+═══════════════════════════════════════════════════ */
+.toast{
+  position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(10px);
+  background:var(--t1);color:var(--bg);padding:10px 20px;
+  border-radius:99px;font-size:13px;font-weight:600;
+  z-index:999;opacity:0;transition:all .25s;pointer-events:none;
+  white-space:nowrap;box-shadow:var(--sh2);
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ═══════════════════════════════════════════════════
+   LEGEND
+═══════════════════════════════════════════════════ */
+.leg{display:flex;gap:12px;flex-wrap:wrap;margin-top:10px}
+.leg-item{display:flex;align-items:center;gap:5px;font-size:11.5px;color:var(--t3)}
+.leg-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+
+/* ═══════════════════════════════════════════════════
+   SCROLLABLE TABLE HINT
+═══════════════════════════════════════════════════ */
+.scroll-hint{
+  font-size:11px;color:var(--t4);text-align:center;padding:6px;
+  display:none;
+}
+
+/* ═══════════════════════════════════════════════════
+   ANIMATIONS
+═══════════════════════════════════════════════════ */
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.fu{animation:fadeUp .35s ease both}
+.fu1{animation-delay:.04s}.fu2{animation-delay:.08s}.fu3{animation-delay:.12s}
+.fu4{animation-delay:.16s}.fu5{animation-delay:.20s}
+
+/* ═══════════════════════════════════════════════════
+   MONO NUMBERS
+═══════════════════════════════════════════════════ */
+.mono{font-family:'JetBrains Mono',monospace;font-size:.9em}
+
+/* ═══════════════════════════════════════════════════
+   RESPONSIVE
+═══════════════════════════════════════════════════ */
+@media(max-width:1100px){
+  .kpi-grid{grid-template-columns:repeat(2,1fr)}
+  .g3{grid-template-columns:1fr 1fr}
+  .goal-grid{grid-template-columns:1fr 1fr}
+  .g21{grid-template-columns:1fr}
+  .color-grid{grid-template-columns:repeat(3,1fr)}
+}
+@media(max-width:768px){
+  :root{--sidebar-w:260px}
+  .sidebar{
+    position:fixed;left:0;top:0;bottom:0;
+    transform:translateX(-100%);z-index:200;
+  }
+  .sidebar.open{transform:translateX(0)}
+  .topbar-menu{display:flex;align-items:center;justify-content:center}
+  .kpi-grid{grid-template-columns:repeat(2,1fr);gap:10px}
+  .g2,.g3,.g21{grid-template-columns:1fr}
+  .span2{grid-column:span 1}
+  .inner{padding:14px}
+  .net-val{font-size:22px}
+  .goal-grid{grid-template-columns:1fr}
+  .scroll-hint{display:block}
+  .cw{height:220px}
+  .cw-lg{height:260px}
+  .color-grid{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:480px){
+  .kpi-grid{grid-template-columns:1fr 1fr}
+  .kpi-val{font-size:18px}
+  .pg-title{font-size:18px}
+  .topbar{padding:0 14px}
+  .btn{padding:6px 10px;font-size:12px}
+}
+</style>
+</head>
+<body data-theme="light">
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- MODAL -->
+<div class="modal-bg" id="modalBg">
+  <div class="modal">
+    <div class="modal-title" id="modalTitle">Rij toevoegen</div>
+    <div class="modal-sub" id="modalSub">Voeg een nieuwe categorie toe</div>
+    <div id="modalBody"></div>
+    <div class="modal-btns">
+      <button class="btn btn-g" onclick="closeModal()">Annuleren</button>
+      <button class="btn btn-a" id="modalOk" onclick="modalConfirm()">Toevoegen</button>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN SHELL -->
+<div class="shell">
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sb-logo">
+    <div class="sb-logo-mark">💶</div>
+    <div class="sb-logo-text">
+      <h1>BudgetPlanner</h1>
+      <p>Aiman Mahgoub</p>
+    </div>
+  </div>
+  <nav class="sb-nav">
+    <div class="sb-section-label">Overzicht</div>
+    <button class="nav-btn active" onclick="go('dashboard')"><span class="nav-icon">📊</span>Dashboard</button>
+    <button class="nav-btn" onclick="go('invoer')"><span class="nav-icon">✏️</span>Budgetinvoer</button>
+    <button class="nav-btn" onclick="go('grafieken')"><span class="nav-icon">📈</span>Grafieken</button>
+    <button class="nav-btn" onclick="go('maanden')"><span class="nav-icon">📅</span>Maandoverzicht</button>
+    <div class="sb-section-label">Planning</div>
+    <button class="nav-btn" onclick="go('doelen')"><span class="nav-icon">🎯</span>Spaardoelen</button>
+    <button class="nav-btn" onclick="go('prognose')"><span class="nav-icon">🔮</span>Prognose</button>
+    <div class="sb-section-label">Beheer</div>
+    <button class="nav-btn" onclick="window.open('index.html','_self')"><span class="nav-icon">👤</span>Over Aiman</button>
+    <button class="nav-btn" onclick="go('instellingen')"><span class="nav-icon">🎨</span>Instellingen</button>
+  </nav>
+  <div class="sb-bottom">
+    <div class="theme-row">
+      <button class="theme-btn on" id="lBtn" onclick="setTheme('light')">☀️ Licht</button>
+      <button class="theme-btn" id="dBtn" onclick="setTheme('dark')">🌙 Donker</button>
+    </div>
+  </div>
+</aside>
+<div class="mob-overlay" id="mobOvl" onclick="closeSidebar()"></div>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <button class="topbar-menu btn-icon btn" onclick="toggleSidebar()">☰</button>
+    <span class="topbar-title" id="pgTitle">Dashboard</span>
+    <select class="topbar-year" id="yrSel" onchange="updateYear()">
+      <option>2023</option><option>2024</option><option>2025</option>
+      <option selected>2026</option><option>2027</option><option>2028</option>
+    </select>
+    <button class="btn btn-g btn-sm" onclick="exportCSV()" title="Exporteer CSV">⬇ CSV</button>
+    <button class="btn btn-a btn-sm" onclick="saveData()" id="saveBtn">💾 Opslaan</button>
+  </div>
+
+  <div class="scroll">
+  <div class="inner">
+
+  <!-- ══════════ DASHBOARD ══════════ -->
+  <div class="page on" id="pg-dashboard">
+    <div class="pg-head fu">
+      <div class="pg-title">Goedendag 👋</div>
+      <div class="pg-sub" id="pgSub">Financieel overzicht voor <span id="yrLbl">2026</span></div>
+    </div>
+
+    <!-- Net Banner -->
+    <div class="net-banner net-pos fu fu1" id="netBanner">
+      <div>
+        <div class="net-lbl" id="netLbl" style="color:var(--pos)">Netto Saldo — Jaarlijks</div>
+        <div class="net-val" id="netVal">€ 0,00</div>
+        <div class="net-detail" id="netDetail">berekening loopt…</div>
+      </div>
+      <div class="net-icon" id="netIco">✅</div>
+    </div>
+
+    <!-- KPIs -->
+    <div class="kpi-grid">
+      <div class="kpi fu fu2" style="--kc:#10b981">
+        <div class="kpi-ico">💰</div>
+        <div class="kpi-lbl">Totaal Inkomen</div>
+        <div class="kpi-val" id="k-inc">€—</div>
+        <div class="kpi-sub" id="k-inc-s">Per jaar</div>
+      </div>
+      <div class="kpi fu fu3" style="--kc:#f43f5e">
+        <div class="kpi-ico">💸</div>
+        <div class="kpi-lbl">Totale Uitgaven</div>
+        <div class="kpi-val" id="k-exp">€—</div>
+        <div class="kpi-sub" id="k-exp-s">Per jaar</div>
+      </div>
+      <div class="kpi fu fu4" style="--kc:#3b82f6">
+        <div class="kpi-ico">🏦</div>
+        <div class="kpi-lbl">Gespaard</div>
+        <div class="kpi-val" id="k-sav">€—</div>
+        <div class="kpi-sub up" id="k-sav-s">—%</div>
+      </div>
+      <div class="kpi fu fu5" style="--kc:#f59e0b">
+        <div class="kpi-ico">📉</div>
+        <div class="kpi-lbl">Grootste Post</div>
+        <div class="kpi-val" id="k-big">€—</div>
+        <div class="kpi-sub" id="k-big-s">—</div>
+      </div>
+    </div>
+
+    <!-- Charts -->
+    <div class="g2 fu fu2">
+      <div class="card">
+        <div class="card-h"><div><div class="card-t">Maandelijks Overzicht</div><div class="card-s">Inkomen · Uitgaven · Sparen</div></div></div>
+        <div class="card-b"><div class="cw"><canvas id="cBar"></canvas></div></div>
+      </div>
+      <div class="card">
+        <div class="card-h"><div><div class="card-t">Verdeling Uitgaven</div><div class="card-s">Per categorie (jaarlijks)</div></div></div>
+        <div class="card-b">
+          <div class="cw-sm"><canvas id="cDonut"></canvas></div>
+          <div class="leg" id="donutLeg"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Progress bars -->
+    <div class="card fu fu3 mb16">
+      <div class="card-h"><div><div class="card-t">Uitgaven per Categorie</div><div class="card-s">Aandeel van totale uitgaven</div></div></div>
+      <div class="card-b"><div class="prog-list" id="progList"></div></div>
+    </div>
+
+    <!-- Extra quick stats -->
+    <div class="g3 fu fu4">
+      <div class="card">
+        <div class="card-h"><div class="card-t">Maandgemiddelde</div></div>
+        <div class="card-b">
+          <div style="display:flex;flex-direction:column;gap:10px" id="avgStats"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-h"><div class="card-t">Spaardoelratio</div><div style="font-size:11px;color:var(--t3)">Doel: 20%</div></div>
+        <div class="card-b"><div class="cw-sm"><canvas id="cGauge"></canvas></div></div>
+      </div>
+      <div class="card">
+        <div class="card-h"><div class="card-t">Top 5 Uitgaven</div></div>
+        <div class="card-b"><div id="top5" style="display:flex;flex-direction:column;gap:8px"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ INVOER ══════════ -->
+  <div class="page" id="pg-invoer">
+    <div class="pg-head fu">
+      <div class="pg-title">Budgetinvoer ✏️</div>
+      <div class="pg-sub">Bewerk bedragen direct. Schakel bewerkingsmodus in voor rijen toevoegen/verwijderen.</div>
+    </div>
+    <div class="card fu fu1">
+      <div class="edit-bar">
+        <span class="edit-bar-label">Bewerkingsmodus:</span>
+        <label class="toggle" style="margin-right:6px">
+          <input type="checkbox" id="editToggle" onchange="toggleEditMode()">
+          <span class="tog-sl"></span>
+        </label>
+        <span id="editStatus" style="font-size:12px;color:var(--t3)">Uit — klik invoervelden om te bewerken</span>
+        <div class="row-actions" id="editActions" style="display:none">
+          <button class="btn btn-g btn-sm" onclick="openAddCatModal()">+ Categorie</button>
+        </div>
+      </div>
+      <div class="scroll-hint">← Veeg zijwaarts om alle maanden te zien →</div>
+      <div class="tbl-wrap card-b-np" style="padding:0 0 4px">
+        <table class="btbl" id="mainTbl">
+          <thead>
+            <tr id="tblHead">
+              <th style="min-width:170px;text-align:left">Categorie</th>
+              <th>Jan</th><th>Feb</th><th>Mrt</th><th>Apr</th><th>Mei</th><th>Jun</th>
+              <th>Jul</th><th>Aug</th><th>Sep</th><th>Okt</th><th>Nov</th><th>Dec</th>
+              <th>Totaal</th>
+            </tr>
+          </thead>
+          <tbody id="tblBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ GRAFIEKEN ══════════ -->
+  <div class="page" id="pg-grafieken">
+    <div class="pg-head fu"><div class="pg-title">Grafieken 📈</div><div class="pg-sub">Diepgaande analyses van jouw financiën</div></div>
+    <div class="g2 fu fu1">
+      <div class="card">
+        <div class="card-h"><div class="card-t">Netto Saldo per Maand</div></div>
+        <div class="card-b"><div class="cw"><canvas id="cLine"></canvas></div></div>
+      </div>
+      <div class="card">
+        <div class="card-h"><div class="card-t">Inkomensverdeling</div></div>
+        <div class="card-b"><div class="cw"><canvas id="cIncPie"></canvas></div></div>
+      </div>
+    </div>
+    <div class="card fu fu2 mb16">
+      <div class="card-h"><div class="card-t">Uitgaven vs Inkomen per Maand</div><div style="font-size:11px;color:var(--t3)">Gestapeld overzicht</div></div>
+      <div class="card-b"><div class="cw-lg"><canvas id="cStacked"></canvas></div></div>
+    </div>
+    <div class="g2 fu fu3">
+      <div class="card">
+        <div class="card-h"><div class="card-t">Spaardoelratio per Maand</div><div style="font-size:11px;color:var(--t3)">Streef: ≥20%</div></div>
+        <div class="card-b"><div class="cw"><canvas id="cSavRate"></canvas></div></div>
+      </div>
+      <div class="card">
+        <div class="card-h"><div class="card-t">Cumulatief Gespaard</div></div>
+        <div class="card-b"><div class="cw"><canvas id="cCumul"></canvas></div></div>
+      </div>
+    </div>
+    <div class="card fu fu4 mb16">
+      <div class="card-h"><div class="card-t">Uitgaven Heatmap per Categorie</div><div style="font-size:11px;color:var(--t3)">Welke maanden zijn duur?</div></div>
+      <div class="card-b"><div class="cw-lg"><canvas id="cHeat"></canvas></div></div>
+    </div>
+  </div>
+
+  <!-- ══════════ MAANDEN ══════════ -->
+  <div class="page" id="pg-maanden">
+    <div class="pg-head fu"><div class="pg-title">Maandoverzicht 📅</div><div class="pg-sub">Selecteer een maand voor detail</div></div>
+    <div class="m-tabs" id="mTabs"></div>
+    <div class="kpi-grid fu fu1" id="mKpis" style="margin-bottom:16px"></div>
+    <div class="g2 fu fu2">
+      <div class="card">
+        <div class="card-h"><div class="card-t">Categorieverdeling</div></div>
+        <div class="card-b"><div class="cw"><canvas id="cMDonut"></canvas></div></div>
+      </div>
+      <div class="card">
+        <div class="card-h"><div class="card-t">Vergelijking met gemiddelde</div></div>
+        <div class="card-b"><div class="cw"><canvas id="cMBar"></canvas></div></div>
+      </div>
+    </div>
+    <div class="card fu fu3 mb16">
+      <div class="card-h"><div class="card-t">Alle categorieën deze maand</div></div>
+      <div class="card-b"><div class="prog-list" id="mProgList"></div></div>
+    </div>
+  </div>
+
+  <!-- ══════════ DOELEN ══════════ -->
+  <div class="page" id="pg-doelen">
+    <div class="pg-head fu"><div class="pg-title">Spaardoelen 🎯</div><div class="pg-sub">Stel doelen in en volg je voortgang</div></div>
+    <div class="goal-grid fu fu1" id="goalGrid"></div>
+    <button class="btn-add-goal fu fu2" id="addGoalBtn" onclick="openGoalModal()">＋ Nieuw spaardoel toevoegen</button>
+  </div>
+
+  <!-- ══════════ PROGNOSE ══════════ -->
+  <div class="page" id="pg-prognose">
+    <div class="pg-head fu"><div class="pg-title">Prognose 🔮</div><div class="pg-sub">Simuleer jouw financiële toekomst</div></div>
+    <div class="g2 fu fu1">
+      <div class="card">
+        <div class="card-h"><div class="card-t">Scenario's</div></div>
+        <div class="card-b">
+          <div class="form-group">
+            <label class="form-label">Jaarlijkse inkomensgroei (%)</label>
+            <input type="range" min="-10" max="30" value="3" id="growthInc" oninput="updatePrognose()" style="width:100%;accent-color:var(--a)">
+            <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--t3);margin-top:3px"><span>-10%</span><span id="growthIncVal" style="font-weight:700;color:var(--a)">3%</span><span>+30%</span></div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Jaarlijkse kostengroei (%)</label>
+            <input type="range" min="-5" max="20" value="2" id="growthExp" oninput="updatePrognose()" style="width:100%;accent-color:var(--neg)">
+            <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--t3);margin-top:3px"><span>-5%</span><span id="growthExpVal" style="font-weight:700;color:var(--neg)">2%</span><span>+20%</span></div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Prognoseperiode (jaren)</label>
+            <input type="range" min="1" max="20" value="5" id="progYears" oninput="updatePrognose()" style="width:100%;accent-color:var(--info)">
+            <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--t3);margin-top:3px"><span>1</span><span id="progYearsVal" style="font-weight:700;color:var(--info)">5 jaar</span><span>20</span></div>
+          </div>
+          <div class="divider"></div>
+          <div id="prognoseStats" style="display:flex;flex-direction:column;gap:10px"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-h"><div class="card-t">Prognose Grafiek</div></div>
+        <div class="card-b"><div class="cw-lg"><canvas id="cProg"></canvas></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ INSTELLINGEN ══════════ -->
+  <div class="page" id="pg-instellingen">
+    <div class="pg-head fu"><div class="pg-title">Instellingen 🎨</div><div class="pg-sub">Pas het uiterlijk en gedrag aan</div></div>
+    <div class="g2">
+      <div class="card fu fu1">
+        <div class="card-h"><div class="card-t">Thema & Modus</div></div>
+        <div class="card-b">
+          <div class="set-row">
+            <div class="set-info"><h4>Donkere modus</h4><p>Schakel naar donker kleurschema</p></div>
+            <label class="toggle"><input type="checkbox" id="darkChk" onchange="toggleDarkChk()"><span class="tog-sl"></span></label>
+          </div>
+          <div class="set-row">
+            <div class="set-info"><h4>Accentkleur — Presets</h4><p>Kies een vooraf ingesteld palet</p></div>
+            <div></div>
+          </div>
+          <div class="presets">
+            <div class="preset on" style="background:#06d6a0" onclick="applyPreset('#06d6a0','#059669',this)" title="Mint"></div>
+            <div class="preset" style="background:#6366f1" onclick="applyPreset('#6366f1','#4f46e5',this)" title="Indigo"></div>
+            <div class="preset" style="background:#f43f5e" onclick="applyPreset('#f43f5e','#e11d48',this)" title="Rood"></div>
+            <div class="preset" style="background:#f59e0b" onclick="applyPreset('#f59e0b','#d97706',this)" title="Amber"></div>
+            <div class="preset" style="background:#10b981" onclick="applyPreset('#10b981','#059669',this)" title="Groen"></div>
+            <div class="preset" style="background:#8b5cf6" onclick="applyPreset('#8b5cf6','#7c3aed',this)" title="Paars"></div>
+            <div class="preset" style="background:#ec4899" onclick="applyPreset('#ec4899','#db2777',this)" title="Roze"></div>
+            <div class="preset" style="background:#0ea5e9" onclick="applyPreset('#0ea5e9','#0284c7',this)" title="Blauw"></div>
+            <div class="preset" style="background:#ff6b35" onclick="applyPreset('#ff6b35','#ea580c',this)" title="Oranje"></div>
+          </div>
+        </div>
+      </div>
+      <div class="card fu fu2">
+        <div class="card-h"><div class="card-t">Aangepaste Kleuren</div></div>
+        <div class="card-b">
+          <div class="color-grid">
+            <div class="clr-item">
+              <label>Accent</label>
+              <div class="clr-swatch"><div class="clr-prev" id="cp-a" style="background:#06d6a0"></div><input type="color" value="#06d6a0" oninput="setVar('a',this.value);setVar('aRgb',hexToRgb(this.value));document.getElementById('cp-a').style.background=this.value;rebuildCharts()"></div>
+            </div>
+            <div class="clr-item">
+              <label>Positief</label>
+              <div class="clr-swatch"><div class="clr-prev" id="cp-pos" style="background:#10b981"></div><input type="color" value="#10b981" oninput="setVar('pos',this.value);document.getElementById('cp-pos').style.background=this.value"></div>
+            </div>
+            <div class="clr-item">
+              <label>Negatief</label>
+              <div class="clr-swatch"><div class="clr-prev" id="cp-neg" style="background:#f43f5e"></div><input type="color" value="#f43f5e" oninput="setVar('neg',this.value);document.getElementById('cp-neg').style.background=this.value"></div>
+            </div>
+            <div class="clr-item">
+              <label>Info</label>
+              <div class="clr-swatch"><div class="clr-prev" id="cp-info" style="background:#3b82f6"></div><input type="color" value="#3b82f6" oninput="setVar('info',this.value);document.getElementById('cp-info').style.background=this.value"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card fu fu3">
+      <div class="card-h"><div class="card-t">Gegevensbeheer</div></div>
+      <div class="card-b">
+        <div class="set-row">
+          <div class="set-info"><h4>Opslaan in browser</h4><p>Bewaar jouw budgetgegevens lokaal</p></div>
+          <button class="btn btn-a btn-sm" onclick="saveData()">💾 Opslaan</button>
+        </div>
+        <div class="set-row">
+          <div class="set-info"><h4>Exporteren als CSV</h4><p>Download een spreadsheet-bestand</p></div>
+          <button class="btn btn-g btn-sm" onclick="exportCSV()">⬇ CSV</button>
+        </div>
+        <div class="set-row">
+          <div class="set-info"><h4>Gegevens resetten</h4><p>Herstel alle waarden naar de standaard</p></div>
+          <button class="btn btn-g btn-sm" onclick="resetData()" style="color:var(--neg)">🗑 Reset</button>
+        </div>
+        <div class="set-row">
+          <div class="set-info"><h4>Auteur</h4><p>Aiman Mahgoub — BudgetPlanner v2.0</p></div>
+          <span style="font-size:12px;color:var(--t3)">2026</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  </div><!-- /inner -->
+  </div><!-- /scroll -->
+</div><!-- /main -->
+</div><!-- /shell -->
+
+<script>
+'use strict';
+// ══════════════════════════════════════════════════════════════════
+// DATA
+// ══════════════════════════════════════════════════════════════════
+const MN = ['Jan','Feb','Mrt','Apr','Mei','Jun','Jul','Aug','Sep','Okt','Nov','Dec'];
+const CAT_COLS = ['#06d6a0','#6366f1','#f59e0b','#f43f5e','#8b5cf6','#3b82f6'];
+
+const DEF = {
+  inkomen:[
+    {id:'sal', lbl:'Salaris / Loon',           v:[3500,3500,3500,3500,3500,3500,3500,3500,3500,3500,3500,3500]},
+    {id:'frl', lbl:'Freelance / Bijverdienste', v:[400,400,400,400,400,400,400,400,400,400,400,400]},
+    {id:'bel', lbl:'Beleggingen',              v:[150,150,150,150,150,150,150,150,150,150,150,150]},
+    {id:'hur', lbl:'Huurinkomsten',            v:[0,0,0,0,0,0,0,0,0,0,0,0]},
+    {id:'ovi', lbl:'Overig inkomen',           v:[0,0,0,0,0,0,0,0,0,0,0,0]},
+  ],
+  cats:[
+    {key:'wonen', lbl:'Wonen & Nutsvoorzieningen', items:[
+      {id:'hyp',lbl:'Huur / Hypotheek',   v:[1200,1200,1200,1200,1200,1200,1200,1200,1200,1200,1200,1200]},
+      {id:'ele',lbl:'Elektriciteit',      v:[90,90,90,90,90,90,90,90,90,90,90,90]},
+      {id:'gas',lbl:'Water / Gas',        v:[55,55,55,55,55,55,55,55,55,55,55,55]},
+      {id:'net',lbl:'Internet / Telefoon',v:[65,65,65,65,65,65,65,65,65,65,65,65]},
+      {id:'wvz',lbl:'Woonverzekering',    v:[80,80,80,80,80,80,80,80,80,80,80,80]},
+      {id:'rep',lbl:'Onderhoud/Reparatie',v:[40,40,40,40,40,40,40,40,40,40,40,40]},
+    ]},
+    {key:'voeding', lbl:'Voeding & Horeca', items:[
+      {id:'boo',lbl:'Boodschappen',        v:[350,350,350,350,350,350,350,350,350,350,350,350]},
+      {id:'uit',lbl:'Uit eten',            v:[120,120,120,120,120,120,120,120,120,120,120,120]},
+      {id:'kof',lbl:'Koffie / Snacks',    v:[40,40,40,40,40,40,40,40,40,40,40,40]},
+      {id:'bez',lbl:'Maaltijdbezorging',  v:[50,50,50,50,50,50,50,50,50,50,50,50]},
+    ]},
+    {key:'vervoer', lbl:'Vervoer', items:[
+      {id:'aut',lbl:'Auto / Lease',        v:[280,280,280,280,280,280,280,280,280,280,280,280]},
+      {id:'bra',lbl:'Brandstof',           v:[100,100,100,100,100,100,100,100,100,100,100,100]},
+      {id:'avz',lbl:'Autoverzekering',     v:[85,85,85,85,85,85,85,85,85,85,85,85]},
+      {id:'ov', lbl:'Openbaar vervoer',    v:[40,40,40,40,40,40,40,40,40,40,40,40]},
+      {id:'par',lbl:'Parkeren / Tol',      v:[20,20,20,20,20,20,20,20,20,20,20,20]},
+    ]},
+    {key:'gezondheid', lbl:'Gezondheid & Welzijn', items:[
+      {id:'zvz',lbl:'Zorgverzekering',     v:[135,135,135,135,135,135,135,135,135,135,135,135]},
+      {id:'art',lbl:'Artsbezoek',          v:[40,40,40,40,40,40,40,40,40,40,40,40]},
+      {id:'med',lbl:'Medicijnen',          v:[25,25,25,25,25,25,25,25,25,25,25,25]},
+      {id:'gym',lbl:'Sportschool',         v:[35,35,35,35,35,35,35,35,35,35,35,35]},
+    ]},
+    {key:'persoonlijk', lbl:'Persoonlijk & Vrije Tijd', items:[
+      {id:'kle',lbl:'Kleding / Mode',      v:[80,80,80,80,80,80,80,80,80,80,80,80]},
+      {id:'ent',lbl:'Uitgaan / Vermaak',   v:[70,70,70,70,70,70,70,70,70,70,70,70]},
+      {id:'abo',lbl:'Abonnementen',        v:[45,45,45,45,45,45,45,45,45,45,45,45]},
+      {id:'pvc',lbl:'Persoonlijke verzorging',v:[35,35,35,35,35,35,35,35,35,35,35,35]},
+      {id:'cad',lbl:'Cadeaus / Donaties',  v:[40,40,40,40,40,40,40,40,40,40,40,40]},
+      {id:'vak',lbl:'Vakantie / Reizen',   v:[150,0,0,0,0,150,0,0,0,0,0,400]},
+    ]},
+    {key:'sparen', lbl:'Sparen & Beleggen', items:[
+      {id:'noo',lbl:'Noodfonds',           v:[150,150,150,150,150,150,150,150,150,150,150,150]},
+      {id:'pen',lbl:'Pensioen / Lijfrente',v:[200,200,200,200,200,200,200,200,200,200,200,200]},
+      {id:'etf',lbl:"Aandelen / ETF's",   v:[100,100,100,100,100,100,100,100,100,100,100,100]},
+      {id:'sdo',lbl:'Overige spaardoelen', v:[75,75,75,75,75,75,75,75,75,75,75,75]},
+    ]},
+  ],
+  goals:[
+    {id:'g1',lbl:'Vakantie Fonds',target:3000,saved:800,color:'#f59e0b'},
+    {id:'g2',lbl:'Noodfonds',target:10000,saved:2400,color:'#10b981'},
+    {id:'g3',lbl:'Nieuwe Auto',target:15000,saved:3500,color:'#6366f1'},
+  ]
+};
+
+let D = JSON.parse(JSON.stringify(DEF));
+let editMode = false;
+let selMonth = 0;
+const Ch = {};
+
+// ══════════════════════════════════════════════════════════════════
+// STORAGE
+// ══════════════════════════════════════════════════════════════════
+function loadData(){try{const s=localStorage.getItem('bp_v2');if(s)D=JSON.parse(s);}catch(e){}}
+function saveData(){
+  try{
+    localStorage.setItem('bp_v2',JSON.stringify(D));
+    toast('✓ Opgeslagen!');
+  }catch(e){toast('Opslaan mislukt');}
+}
+function resetData(){
+  if(!confirm('Alle gegevens resetten naar standaard?'))return;
+  D=JSON.parse(JSON.stringify(DEF));
+  buildTable();renderAll();toast('Gereset!');
+}
+
+// ══════════════════════════════════════════════════════════════════
+// CALC HELPERS
+// ══════════════════════════════════════════════════════════════════
+const sum = arr => arr.reduce((a,b)=>a+(+b||0),0);
+const rowSum = it => sum(it.v);
+const mIncome = m => sum(D.inkomen.map(it=>it.v[m]||0));
+const mExpenses = m => sum(D.cats.flatMap(c=>c.items.map(it=>it.v[m]||0)));
+const mSavings = m => sum(D.cats.find(c=>c.key==='sparen').items.map(it=>it.v[m]||0));
+const mCat = (cat,m) => sum(cat.items.map(it=>it.v[m]||0));
+const annInc = () => sum(D.inkomen.map(rowSum));
+const annExp = () => sum(D.cats.flatMap(c=>c.items.map(rowSum)));
+const annSav = () => sum(D.cats.find(c=>c.key==='sparen').items.map(rowSum));
+const annCat = cat => sum(cat.items.map(rowSum));
+
+// ══════════════════════════════════════════════════════════════════
+// FORMAT
+// ══════════════════════════════════════════════════════════════════
+function eur(v){return '€\u00A0'+Number(v).toLocaleString('nl-NL',{minimumFractionDigits:2,maximumFractionDigits:2})}
+function eurShort(v){
+  const abs=Math.abs(v);
+  if(abs>=1000)return (v<0?'-':'')+'€'+(abs/1000).toLocaleString('nl-NL',{minimumFractionDigits:1,maximumFractionDigits:1})+'k';
+  return '€'+v.toLocaleString('nl-NL',{minimumFractionDigits:0,maximumFractionDigits:0});
+}
+function pct(v){return(v*100).toFixed(1)+'%'}
+
+// ══════════════════════════════════════════════════════════════════
+// NAV
+// ══════════════════════════════════════════════════════════════════
+const PAGE_NAMES={dashboard:'Dashboard',invoer:'Budgetinvoer',grafieken:'Grafieken',maanden:'Maandoverzicht',doelen:'Spaardoelen',prognose:'Prognose',instellingen:'Instellingen'};
+function go(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('pg-'+id).classList.add('on');
+  document.querySelectorAll('.nav-btn').forEach(b=>{if(b.getAttribute('onclick').includes("'"+id+"'"))b.classList.add('active');});
+  document.getElementById('pgTitle').textContent=PAGE_NAMES[id]||id;
+  closeSidebar();
+  if(id==='grafieken')setTimeout(buildGrafiekenCharts,60);
+  if(id==='maanden'){buildMonthTabs();setTimeout(renderMonth,60);}
+  if(id==='doelen')renderGoals();
+  if(id==='prognose')setTimeout(updatePrognose,60);
+}
+function toggleSidebar(){
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('mobOvl').classList.toggle('show');
+}
+function closeSidebar(){
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('mobOvl').classList.remove('show');
+}
+
+// ══════════════════════════════════════════════════════════════════
+// THEME
+// ══════════════════════════════════════════════════════════════════
+function setTheme(t){
+  document.body.setAttribute('data-theme',t);
+  document.getElementById('lBtn').classList.toggle('on',t==='light');
+  document.getElementById('dBtn').classList.toggle('on',t==='dark');
+  document.getElementById('darkChk').checked=t==='dark';
+  localStorage.setItem('bp_theme',t);
+  setTimeout(rebuildCharts,80);
+}
+function toggleDarkChk(){setTheme(document.getElementById('darkChk').checked?'dark':'light');}
+function setVar(n,v){document.documentElement.style.setProperty('--'+n,v);}
+function hexToRgb(h){h=h.replace('#','');return parseInt(h.slice(0,2),16)+','+parseInt(h.slice(2,4),16)+','+parseInt(h.slice(4,6),16);}
+function hexToRgba(h,a){const rgb=hexToRgb(h);return 'rgba('+rgb+','+a+')';}
+function applyPreset(a,a2,el){
+  setVar('a',a);setVar('a2',a2);
+  const rgb=hexToRgb(a);setVar('aRgb',rgb);
+  document.querySelectorAll('.preset').forEach(p=>p.classList.remove('on'));
+  el.classList.add('on');
+  document.getElementById('cp-a').style.background=a;
+  setTimeout(rebuildCharts,60);
+}
+function getAccent(){return getComputedStyle(document.documentElement).getPropertyValue('--a').trim()||'#06d6a0';}
+function getT3(){return getComputedStyle(document.documentElement).getPropertyValue('--t3').trim()||'#64748b';}
+function getBrd(){return getComputedStyle(document.documentElement).getPropertyValue('--brd2').trim()||'rgba(148,163,184,.32)';}
+
+// ══════════════════════════════════════════════════════════════════
+// YEAR
+// ══════════════════════════════════════════════════════════════════
+function updateYear(){const y=document.getElementById('yrSel').value;document.getElementById('yrLbl').textContent=y;}
+
+// ══════════════════════════════════════════════════════════════════
+// TOAST
+// ══════════════════════════════════════════════════════════════════
+let toastTmr;
+function toast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  clearTimeout(toastTmr);toastTmr=setTimeout(()=>t.classList.remove('show'),2200);
+}
+
+// ══════════════════════════════════════════════════════════════════
+// MODAL
+// ══════════════════════════════════════════════════════════════════
+let modalCb=null;
+function openModal(title,sub,bodyHTML,okLabel,cb){
+  document.getElementById('modalTitle').textContent=title;
+  document.getElementById('modalSub').textContent=sub;
+  document.getElementById('modalBody').innerHTML=bodyHTML;
+  document.getElementById('modalOk').textContent=okLabel||'OK';
+  modalCb=cb;
+  document.getElementById('modalBg').classList.add('show');
+}
+function closeModal(){document.getElementById('modalBg').classList.remove('show');modalCb=null;}
+function modalConfirm(){if(modalCb)modalCb();closeModal();}
+
+// ══════════════════════════════════════════════════════════════════
+// EDIT MODE
+// ══════════════════════════════════════════════════════════════════
+function toggleEditMode(){
+  editMode=document.getElementById('editToggle').checked;
+  document.getElementById('tblBody').parentElement.parentElement.classList.toggle('edit-mode-on',editMode);
+  document.getElementById('editStatus').textContent=editMode?'Aan — rijen toevoegen/verwijderen/hernoemen':'Uit — klik invoervelden om te bewerken';
+  document.getElementById('editActions').style.display=editMode?'flex':'none';
+  document.querySelectorAll('.btn-del').forEach(b=>{b.style.opacity=editMode?'1':'0';b.style.pointerEvents=editMode?'all':'none';});
+}
+function openAddCatModal(){
+  openModal('Nieuwe Categorie','Voeg een nieuwe uitgavencategorie toe',`
+    <div class="form-group"><label class="form-label">Categorienaam</label><input class="form-inp" id="newCatName" placeholder="bijv. Huisdier" /></div>
+  `,'Toevoegen',()=>{
+    const nm=document.getElementById('newCatName').value.trim();
+    if(!nm){toast('Naam vereist!');return;}
+    const key='cat_'+Date.now();
+    D.cats.push({key,lbl:nm,items:[]});
+    buildTable();toast('Categorie toegevoegd!');
+  });
+  setTimeout(()=>document.getElementById('newCatName').focus(),100);
+}
+function openAddRowModal(catKey){
+  openModal('Rij toevoegen','Nieuwe uitgave toevoegen in deze categorie',`
+    <div class="form-group"><label class="form-label">Naam</label><input class="form-inp" id="newRowName" placeholder="bijv. Energie" /></div>
+    <div class="form-group"><label class="form-label">Standaardbedrag per maand (€)</label><input class="form-inp" type="number" id="newRowAmt" placeholder="0" min="0" /></div>
+  `,'Toevoegen',()=>{
+    const nm=document.getElementById('newRowName').value.trim();
+    const amt=parseFloat(document.getElementById('newRowAmt').value)||0;
+    if(!nm){toast('Naam vereist!');return;}
+    const cat=D.cats.find(c=>c.key===catKey);
+    if(cat)cat.items.push({id:'r_'+Date.now(),lbl:nm,v:Array(12).fill(amt)});
+    buildTable();renderAll();toast('Rij toegevoegd!');
+  });
+  setTimeout(()=>document.getElementById('newRowName').focus(),100);
+}
+function deleteRow(catKey,id){
+  if(!confirm('Rij verwijderen?'))return;
+  const cat=D.cats.find(c=>c.key===catKey);
+  if(cat)cat.items=cat.items.filter(i=>i.id!==id);
+  buildTable();renderAll();toast('Verwijderd');
+}
+function deleteInkomenRow(id){
+  if(!confirm('Rij verwijderen?'))return;
+  D.inkomen=D.inkomen.filter(i=>i.id!==id);
+  buildTable();renderAll();toast('Verwijderd');
+}
+function openAddInkomenModal(){
+  openModal('Inkomen toevoegen','Nieuwe inkomstenbron',`
+    <div class="form-group"><label class="form-label">Naam</label><input class="form-inp" id="newIncName" placeholder="bijv. Huurinkomsten" /></div>
+    <div class="form-group"><label class="form-label">Bedrag per maand (€)</label><input class="form-inp" type="number" id="newIncAmt" placeholder="0" min="0" /></div>
+  `,'Toevoegen',()=>{
+    const nm=document.getElementById('newIncName').value.trim();
+    const amt=parseFloat(document.getElementById('newIncAmt').value)||0;
+    if(!nm){toast('Naam vereist!');return;}
+    D.inkomen.push({id:'i_'+Date.now(),lbl:nm,v:Array(12).fill(amt)});
+    buildTable();renderAll();toast('Inkomen toegevoegd!');
+  });
+}
+
+// ══════════════════════════════════════════════════════════════════
+// TABLE BUILD
+// ══════════════════════════════════════════════════════════════════
+function buildTable(){
+  const tb=document.getElementById('tblBody');
+  tb.innerHTML='';
+  // INKOMEN
+  addSecRow(tb,'▸ INKOMEN','inkomen');
+  D.inkomen.forEach(it=>addDataRow(tb,it,'ink',null));
+  addTotRow(tb,'TOTAAL INKOMEN',D.inkomen,'t-ink');
+  // CATS
+  D.cats.forEach((cat,ci)=>{
+    addSecRow(tb,'▸ '+cat.lbl.toUpperCase(),cat.key,ci);
+    cat.items.forEach(it=>addDataRow(tb,it,'cat',cat.key));
+    addTotRow(tb,'TOTAAL '+cat.lbl.toUpperCase(),cat.items,'t-'+cat.key);
+  });
+  // NET
+  addNetRow(tb);
+}
+
+function addSecRow(tb,label,type,ci){
+  const tr=document.createElement('tr');tr.className='sec-row';
+  let del='';
+  if(editMode&&type!=='inkomen'&&ci!==undefined){
+    del=`<button class="btn-del" onclick="if(confirm('Categorie verwijderen?')){D.cats.splice(${ci},1);buildTable();renderAll();toast('Verwijderd');}" title="Verwijder categorie">✕</button>`;
+  }
+  tr.innerHTML=`<td colspan="14" style="display:flex;align-items:center;gap:6px;justify-content:space-between">
+    <span>${label}</span>
+    <div style="display:flex;gap:6px">
+      ${editMode&&type==='inkomen'?`<button class="btn btn-g btn-sm" onclick="openAddInkomenModal()" style="font-size:10px;padding:3px 7px">+ Rij</button>`:''}
+      ${editMode&&type!=='inkomen'&&type!=='ink'?`<button class="btn btn-g btn-sm" onclick="openAddRowModal('${type}')" style="font-size:10px;padding:3px 7px">+ Rij</button>`:''} 
+      ${del}
+    </div>
+  </td>`;
+  tb.appendChild(tr);
+}
+
+function addDataRow(tb,it,type,catKey){
+  const tr=document.createElement('tr');
+  let cells='';
+  const nameCell=`<td><div style="display:flex;align-items:center;gap:4px">
+    <input class="cat-lbl-input" value="${esc(it.lbl)}" onchange="it.lbl=this.value" style="${editMode?'border-bottom-color:rgba(6,214,160,.3)':''}">
+    <button class="btn-del" style="opacity:${editMode?1:0};pointer-events:${editMode?'all':'none'}"
+      onclick="${type==='ink'?`deleteInkomenRow('${it.id}')`:`deleteRow('${catKey}','${it.id}')`}"
+      title="Verwijder rij">✕</button>
+  </div></td>`;
+  cells+=nameCell;
+  for(let m=0;m<12;m++){
+    cells+=`<td><input class="cell-inp" type="number" min="0" step="1" value="${it.v[m]||0}"
+      data-id="${it.id}" data-m="${m}" onchange="onCell(this,'${type}','${catKey||''}')" /></td>`;
+  }
+  const tot=rowSum(it);
+  cells+=`<td class="tot-cell" id="rt-${it.id}">${eur(tot)}</td>`;
+  tr.innerHTML=cells;
+  tb.appendChild(tr);
+}
+
+function addTotRow(tb,label,items,id){
+  const tr=document.createElement('tr');tr.className='tot-row';
+  let cells=`<td>${label}</td>`;
+  for(let m=0;m<12;m++){
+    const v=sum(items.map(it=>it.v[m]||0));
+    cells+=`<td id="${id}-${m}">${eur(v)}</td>`;
+  }
+  cells+=`<td class="tot-cell" id="${id}-y">${eur(sum(items.map(rowSum)))}</td>`;
+  tr.innerHTML=cells;tb.appendChild(tr);
+}
+
+function addNetRow(tb){
+  const tr=document.createElement('tr');tr.className='gnd-row';
+  let cells=`<td>NETTO (Inkomen − Uitgaven)</td>`;
+  for(let m=0;m<12;m++){
+    const n=mIncome(m)-mExpenses(m);
+    cells+=`<td id="net-${m}" class="${n>=0?'pos-cell':'neg-cell'}">${eur(n)}</td>`;
+  }
+  const an=annInc()-annExp();
+  cells+=`<td id="net-y" class="${an>=0?'pos-cell':'neg-cell'}">${eur(an)}</td>`;
+  tr.innerHTML=cells;tb.appendChild(tr);
+}
+
+function esc(s){return (s||'').replace(/"/g,'&quot;').replace(/</g,'&lt;');}
+
+function onCell(inp,type,catKey){
+  const id=inp.dataset.id,m=parseInt(inp.dataset.m),v=parseFloat(inp.value)||0;
+  if(type==='ink'){const it=D.inkomen.find(i=>i.id===id);if(it)it.v[m]=v;}
+  else{const cat=D.cats.find(c=>c.key===catKey);if(cat){const it=cat.items.find(i=>i.id===id);if(it)it.v[m]=v;}}
+  // update row total
+  let it2=type==='ink'?D.inkomen.find(i=>i.id===id):null;
+  if(!it2){const cat=D.cats.find(c=>c.key===catKey);if(cat)it2=cat.items.find(i=>i.id===id);}
+  if(it2){const el=document.getElementById('rt-'+id);if(el)el.textContent=eur(rowSum(it2));}
+  // update subtotals
+  if(type==='ink'){
+    for(let mi=0;mi<12;mi++){const el=document.getElementById('t-ink-'+mi);if(el)el.textContent=eur(sum(D.inkomen.map(it=>it.v[mi]||0)));}
+    const ey=document.getElementById('t-ink-y');if(ey)ey.textContent=eur(annInc());
+  } else {
+    for(let mi=0;mi<12;mi++){const el=document.getElementById('t-'+catKey+'-'+mi);if(el){const cat=D.cats.find(c=>c.key===catKey);if(cat)el.textContent=eur(mCat(cat,mi));}}
+    const cat=D.cats.find(c=>c.key===catKey);
+    const ey=document.getElementById('t-'+catKey+'-y');if(ey&&cat)ey.textContent=eur(annCat(cat));
+  }
+  // net row
+  for(let mi=0;mi<12;mi++){
+    const n=mIncome(mi)-mExpenses(mi),el=document.getElementById('net-'+mi);
+    if(el){el.textContent=eur(n);el.className=n>=0?'pos-cell':'neg-cell';}
+  }
+  const an=annInc()-annExp(),ey=document.getElementById('net-y');
+  if(ey){ey.textContent=eur(an);ey.className=an>=0?'pos-cell':'neg-cell';}
+  renderAll();
+}
+
+// ══════════════════════════════════════════════════════════════════
+// KPI / DASHBOARD RENDER
+// ══════════════════════════════════════════════════════════════════
+function renderKPIs(){
+  const inc=annInc(),exp=annExp(),sav=annSav(),net=inc-exp;
+  document.getElementById('k-inc').textContent=eurShort(inc);
+  document.getElementById('k-exp').textContent=eurShort(exp);
+  document.getElementById('k-sav').textContent=eurShort(sav);
+  const rate=inc>0?sav/inc:0;
+  const savEl=document.getElementById('k-sav-s');
+  savEl.textContent=pct(rate)+' spaardoelratio';
+  savEl.className='kpi-sub '+(rate>=.2?'up':'dn');
+  // biggest cat
+  let bigV=0,bigN='—';
+  D.cats.forEach(c=>{const v=annCat(c);if(v>bigV){bigV=v;bigN=c.lbl;}});
+  document.getElementById('k-big').textContent=eurShort(bigV);
+  document.getElementById('k-big-s').textContent=bigN;
+  // net banner
+  document.getElementById('netVal').textContent=eur(net);
+  document.getElementById('netDetail').textContent=`${eur(inc)} inkomen − ${eur(exp)} uitgaven`;
+  const nb=document.getElementById('netBanner');
+  nb.className='net-banner '+(net>=0?'net-pos':'net-neg')+' fu fu1';
+  document.getElementById('netIco').textContent=net>=0?'✅':'⚠️';
+  document.getElementById('netLbl').style.color=net>=0?'var(--pos)':'var(--neg)';
+  // avg stats
+  const avg=document.getElementById('avgStats');
+  avg.innerHTML=`
+    ${statLine('Gem. maandinkomen',eur(inc/12),'var(--pos)')}
+    ${statLine('Gem. maanduitgaven',eur(exp/12),'var(--neg)')}
+    ${statLine('Gem. netto / maand',eur(net/12),net>=0?'var(--pos)':'var(--neg)')}
+    ${statLine('Gem. gespaard / maand',eur(sav/12),'var(--a)')}
+  `;
+  // top 5
+  const all=[];
+  D.cats.forEach(c=>c.items.forEach(it=>all.push({lbl:it.lbl,v:rowSum(it)})));
+  all.sort((a,b)=>b.v-a.v);
+  const t5=document.getElementById('top5');
+  t5.innerHTML=all.slice(0,5).map((i,idx)=>`
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
+      <span style="font-size:12.5px;color:var(--t2)">${idx+1}. ${i.lbl}</span>
+      <span style="font-size:12.5px;font-weight:700;color:var(--t1)">${eur(i.v)}</span>
+    </div>`).join('');
+}
+function statLine(lbl,val,col){
+  return `<div style="display:flex;justify-content:space-between;align-items:center">
+    <span style="font-size:12.5px;color:var(--t3)">${lbl}</span>
+    <span style="font-size:13px;font-weight:700;color:${col};font-variant-numeric:tabular-nums">${val}</span>
+  </div>`;
+}
+
+// ══════════════════════════════════════════════════════════════════
+// PROGRESS BARS
+// ══════════════════════════════════════════════════════════════════
+function renderProgress(){
+  const exp=annExp();
+  const pl=document.getElementById('progList');
+  pl.innerHTML=D.cats.map((c,i)=>{
+    const v=annCat(c),p=exp>0?v/exp:0;
+    return `<div class="prog-item">
+      <div class="prog-meta">
+        <span class="prog-name">${c.lbl}</span>
+        <span class="prog-nums">${eur(v)} &nbsp;·&nbsp; ${pct(p)}</span>
+      </div>
+      <div class="prog-track"><div class="prog-fill" style="width:${Math.min(p*100,100)}%;background:${CAT_COLS[i%CAT_COLS.length]}"></div></div>
+    </div>`;
+  }).join('');
+}
+
+// ══════════════════════════════════════════════════════════════════
+// CHART HELPERS
+// ══════════════════════════════════════════════════════════════════
+function mkChart(id,cfg){if(Ch[id]){Ch[id].destroy();delete Ch[id];}const c=document.getElementById(id);if(!c)return;Ch[id]=new Chart(c,cfg);}
+function defOpts(extra={}){
+  return Object.assign({
+    responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{labels:{color:getT3(),font:{family:'Outfit',size:12}}}},
+    scales:{
+      x:{grid:{color:getBrd()},ticks:{color:getT3(),font:{family:'Outfit'}}},
+      y:{grid:{color:getBrd()},ticks:{color:getT3(),font:{family:'Outfit'},callback:v=>eurShort(v)}}
+    }
+  },extra);
+}
+function hexToRgbaLocal(h,a){return hexToRgba(h,a);}
+
+// ══════════════════════════════════════════════════════════════════
+// DASHBOARD CHARTS
+// ══════════════════════════════════════════════════════════════════
+function buildBarChart(){
+  const acc=getAccent();
+  mkChart('cBar',{type:'bar',data:{labels:MN,datasets:[
+    {label:'Inkomen',data:MN.map((_,i)=>mIncome(i)),backgroundColor:'rgba(16,185,129,.7)',borderRadius:5,borderSkipped:false},
+    {label:'Uitgaven',data:MN.map((_,i)=>mExpenses(i)),backgroundColor:'rgba(244,63,94,.6)',borderRadius:5,borderSkipped:false},
+    {label:'Sparen',data:MN.map((_,i)=>mSavings(i)),backgroundColor:hexToRgbaLocal(acc,.7),borderRadius:5,borderSkipped:false},
+  ]},options:defOpts()});
+}
+function buildDonutChart(){
+  const labels=D.cats.map(c=>c.lbl),vals=D.cats.map(c=>annCat(c));
+  mkChart('cDonut',{type:'doughnut',data:{labels,datasets:[{data:vals,backgroundColor:CAT_COLS,borderWidth:0,hoverOffset:10}]},
+    options:{responsive:true,maintainAspectRatio:false,cutout:'65%',
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>' '+ctx.label+': '+eur(ctx.raw)}}}}});
+  const leg=document.getElementById('donutLeg');
+  leg.innerHTML=labels.map((l,i)=>`<div class="leg-item"><div class="leg-dot" style="background:${CAT_COLS[i%CAT_COLS.length]}"></div>${l}</div>`).join('');
+}
+function buildGaugeChart(){
+  const inc=annInc(),sav=annSav();
+  const rate=inc>0?(sav/inc)*100:0;
+  const acc=getAccent();
+  mkChart('cGauge',{type:'doughnut',data:{labels:['Gespaard','Overig'],datasets:[{data:[Math.min(rate,100),Math.max(0,100-rate)],backgroundColor:[rate>=20?acc:'#f43f5e','rgba(0,0,0,.06)'],borderWidth:0,circumference:180,rotation:270}]},
+    options:{responsive:true,maintainAspectRatio:false,cutout:'70%',
+      plugins:{legend:{display:false},tooltip:{enabled:false},
+        afterDraw:{},
+      },
+    },
+    plugins:[{afterDraw(chart){
+      const {ctx,chartArea:{left,right,top,bottom}}=chart;
+      const cx=(left+right)/2,cy=(top+bottom)/2*1.4;
+      ctx.save();
+      ctx.font='bold 22px Outfit';ctx.fillStyle=getComputedStyle(document.documentElement).getPropertyValue('--t1').trim();
+      ctx.textAlign='center';ctx.fillText(pct(rate/100),cx,cy);
+      ctx.font='12px Outfit';ctx.fillStyle=getT3();
+      ctx.fillText('spaardoelratio',cx,cy+18);
+      ctx.restore();
+    }}]
+  });
+}
+
+// ══════════════════════════════════════════════════════════════════
+// GRAFIEKEN CHARTS
+// ══════════════════════════════════════════════════════════════════
+function buildGrafiekenCharts(){
+  const acc=getAccent();
+  // Line
+  mkChart('cLine',{type:'line',data:{labels:MN,datasets:[{label:'Netto Saldo',data:MN.map((_,i)=>mIncome(i)-mExpenses(i)),borderColor:acc,backgroundColor:hexToRgbaLocal(acc,.12),fill:true,tension:.4,pointBackgroundColor:acc,pointRadius:4}]},options:defOpts()});
+  // Income donut
+  mkChart('cIncPie',{type:'doughnut',data:{labels:D.inkomen.map(i=>i.lbl),datasets:[{data:D.inkomen.map(rowSum),backgroundColor:['#10b981','#06d6a0','#6366f1','#f59e0b','#8b5cf6'],borderWidth:0,hoverOffset:8}]},
+    options:{responsive:true,maintainAspectRatio:false,cutout:'60%',plugins:{legend:{position:'right',labels:{color:getT3(),font:{family:'Outfit',size:11}}},tooltip:{callbacks:{label:ctx=>' '+eur(ctx.raw)}}}}});
+  // Stacked
+  mkChart('cStacked',{type:'bar',data:{labels:MN,datasets:D.cats.map((c,i)=>({label:c.lbl,data:MN.map((_,m)=>mCat(c,m)),backgroundColor:hexToRgbaLocal(CAT_COLS[i%CAT_COLS.length],.75),borderRadius:3,borderSkipped:false,stack:'a'}))},
+    options:Object.assign(defOpts(),{scales:{x:{stacked:true,grid:{color:getBrd()},ticks:{color:getT3()}},y:{stacked:true,grid:{color:getBrd()},ticks:{color:getT3(),callback:v=>eurShort(v)}}}})});
+  // Savings rate
+  const rates=MN.map((_,i)=>{const inc=mIncome(i);return inc>0?(mSavings(i)/inc)*100:0;});
+  mkChart('cSavRate',{type:'bar',data:{labels:MN,datasets:[
+    {label:'Spaardoelratio (%)',data:rates,backgroundColor:rates.map(v=>v>=20?hexToRgbaLocal(acc,.75):'rgba(244,63,94,.6)'),borderRadius:5},
+    {label:'Doel 20%',data:Array(12).fill(20),type:'line',borderColor:'#f59e0b',borderDash:[6,4],pointRadius:0,borderWidth:2,fill:false}
+  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:getT3(),font:{family:'Outfit',size:12}}}},scales:{x:{grid:{color:getBrd()},ticks:{color:getT3()}},y:{max:60,grid:{color:getBrd()},ticks:{color:getT3(),callback:v=>v+'%'}}}}});
+  // Cumul
+  let cum=0;const cumD=MN.map((_,i)=>{cum+=mSavings(i);return cum;});
+  mkChart('cCumul',{type:'line',data:{labels:MN,datasets:[{label:'Cumulatief gespaard',data:cumD,borderColor:acc,backgroundColor:hexToRgbaLocal(acc,.15),fill:true,tension:.4,pointBackgroundColor:acc,pointRadius:4}]},options:defOpts()});
+  // Heatmap (radar-like bar)
+  mkChart('cHeat',{type:'bar',data:{labels:MN,datasets:D.cats.map((c,i)=>({label:c.lbl,data:MN.map((_,m)=>mCat(c,m)),backgroundColor:hexToRgbaLocal(CAT_COLS[i%CAT_COLS.length],.75),borderRadius:3,stack:'heat',borderSkipped:false}))},
+    options:Object.assign(defOpts(),{scales:{x:{stacked:true,grid:{color:getBrd()},ticks:{color:getT3()}},y:{stacked:true,grid:{color:getBrd()},ticks:{color:getT3(),callback:v=>eurShort(v)}}}})});
+}
+
+// ══════════════════════════════════════════════════════════════════
+// MONTH PAGE
+// ══════════════════════════════════════════════════════════════════
+function buildMonthTabs(){
+  const c=document.getElementById('mTabs');c.innerHTML='';
+  MN.forEach((m,i)=>{
+    const b=document.createElement('button');b.className='m-tab'+(i===selMonth?' on':'');
+    b.textContent=m;b.onclick=()=>{selMonth=i;buildMonthTabs();renderMonth();};c.appendChild(b);
+  });
+}
+function renderMonth(){
+  const m=selMonth,inc=mIncome(m),exp=mExpenses(m),sav=mSavings(m),net=inc-exp;
+  document.getElementById('mKpis').innerHTML=`
+    <div class="kpi" style="--kc:#10b981"><div class="kpi-ico">💰</div><div class="kpi-lbl">Inkomen</div><div class="kpi-val">${eur(inc)}</div></div>
+    <div class="kpi" style="--kc:#f43f5e"><div class="kpi-ico">💸</div><div class="kpi-lbl">Uitgaven</div><div class="kpi-val">${eur(exp)}</div></div>
+    <div class="kpi" style="--kc:#3b82f6"><div class="kpi-ico">🏦</div><div class="kpi-lbl">Gespaard</div><div class="kpi-val">${eur(sav)}</div></div>
+    <div class="kpi" style="--kc:${net>=0?'#10b981':'#f43f5e'}"><div class="kpi-ico">${net>=0?'✅':'⚠️'}</div><div class="kpi-lbl">Netto</div><div class="kpi-val" style="color:${net>=0?'var(--pos)':'var(--neg)'}">${eur(net)}</div></div>
+  `;
+  const labels=D.cats.map(c=>c.lbl),vals=D.cats.map(c=>mCat(c,m));
+  mkChart('cMDonut',{type:'doughnut',data:{labels,datasets:[{data:vals,backgroundColor:CAT_COLS,borderWidth:0,hoverOffset:8}]},
+    options:{responsive:true,maintainAspectRatio:false,cutout:'60%',plugins:{legend:{position:'bottom',labels:{color:getT3(),font:{family:'Outfit',size:11}}},tooltip:{callbacks:{label:ctx=>' '+ctx.label+': '+eur(ctx.raw)}}}}});
+  const avg=D.cats.map(c=>annCat(c)/12);
+  const acc=getAccent();
+  mkChart('cMBar',{type:'bar',data:{labels,datasets:[
+    {label:MN[m],data:vals,backgroundColor:hexToRgbaLocal(acc,.75),borderRadius:5},
+    {label:'Maandgemiddelde',data:avg,backgroundColor:'rgba(148,163,184,.35)',borderRadius:5}
+  ]},options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{labels:{color:getT3(),font:{family:'Outfit',size:11}}}},
+    scales:{x:{grid:{color:getBrd()},ticks:{color:getT3(),callback:v=>eurShort(v)}},y:{grid:{color:getBrd()},ticks:{color:getT3(),font:{size:11}}}}}});
+  // progress
+  const mp=document.getElementById('mProgList');
+  mp.innerHTML=D.cats.map((c,i)=>{
+    const v=mCat(c,m),p=exp>0?v/exp:0;
+    return `<div class="prog-item">
+      <div class="prog-meta"><span class="prog-name">${c.lbl}</span><span class="prog-nums">${eur(v)} · ${pct(p)}</span></div>
+      <div class="prog-track"><div class="prog-fill" style="width:${Math.min(p*100,100)}%;background:${CAT_COLS[i%CAT_COLS.length]}"></div></div>
+    </div>`;
+  }).join('');
+}
+
+// ══════════════════════════════════════════════════════════════════
+// GOALS
+// ══════════════════════════════════════════════════════════════════
+const GOAL_COLS=['#f59e0b','#10b981','#6366f1','#f43f5e','#8b5cf6','#3b82f6','#ec4899'];
+function renderGoals(){
+  const gg=document.getElementById('goalGrid');
+  gg.innerHTML=D.goals.map((g,i)=>{
+    const pct2=g.target>0?Math.min(g.saved/g.target,1):0;
+    return `<div class="goal-card" style="--gc:${g.color||GOAL_COLS[i%GOAL_COLS.length]}">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:4px">
+        <div class="goal-name">${esc(g.lbl)}</div>
+        <button class="btn-del" style="opacity:1;pointer-events:all" onclick="deleteGoal('${g.id}')">✕</button>
+      </div>
+      <div class="goal-target">Doel: ${eur(g.target)}</div>
+      <div class="goal-val">${eur(g.saved)}</div>
+      <div class="goal-pct" style="color:${g.color||GOAL_COLS[i%GOAL_COLS.length]}">${(pct2*100).toFixed(0)}% bereikt</div>
+      <div class="goal-track"><div class="goal-fill" style="width:${pct2*100}%"></div></div>
+      <div style="margin-top:10px;display:flex;gap:6px">
+        <input type="number" placeholder="Bedrag" class="form-inp" style="flex:1;padding:5px 8px;font-size:12px" id="gsave-${g.id}">
+        <button class="btn btn-a btn-sm" onclick="addToGoal('${g.id}')">+ Voeg toe</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+function deleteGoal(id){if(!confirm('Doel verwijderen?'))return;D.goals=D.goals.filter(g=>g.id!==id);renderGoals();toast('Verwijderd');}
+function addToGoal(id){
+  const inp=document.getElementById('gsave-'+id);
+  const amt=parseFloat(inp.value)||0;
+  if(amt<=0){toast('Voer een geldig bedrag in');return;}
+  const g=D.goals.find(g=>g.id===id);
+  if(g){g.saved=Math.min(g.saved+amt,g.target);renderGoals();toast('+'+eur(amt)+' toegevoegd!');}
+}
+function openGoalModal(){
+  openModal('Nieuw Spaardoel','Stel een spaardoel in',`
+    <div class="form-group"><label class="form-label">Naam</label><input class="form-inp" id="gName" placeholder="bijv. Vakantie"></div>
+    <div class="form-group"><label class="form-label">Doelbedrag (€)</label><input class="form-inp" type="number" id="gTarget" placeholder="5000" min="0"></div>
+    <div class="form-group"><label class="form-label">Al gespaard (€)</label><input class="form-inp" type="number" id="gSaved" placeholder="0" min="0"></div>
+    <div class="form-group"><label class="form-label">Kleur</label><input type="color" id="gColor" value="#f59e0b" style="width:60px;height:36px;border-radius:8px;border:1.5px solid var(--brd2);cursor:pointer"></div>
+  `,'Toevoegen',()=>{
+    const nm=document.getElementById('gName').value.trim();
+    if(!nm){toast('Naam vereist');return;}
+    D.goals.push({id:'g_'+Date.now(),lbl:nm,target:parseFloat(document.getElementById('gTarget').value)||0,saved:parseFloat(document.getElementById('gSaved').value)||0,color:document.getElementById('gColor').value});
+    renderGoals();toast('Doel toegevoegd!');
+  });
+  setTimeout(()=>document.getElementById('gName').focus(),100);
+}
+
+// ══════════════════════════════════════════════════════════════════
+// PROGNOSE
+// ══════════════════════════════════════════════════════════════════
+function updatePrognose(){
+  const gi=parseInt(document.getElementById('growthInc').value);
+  const ge=parseInt(document.getElementById('growthExp').value);
+  const yrs=parseInt(document.getElementById('progYears').value);
+  document.getElementById('growthIncVal').textContent=gi+'%';
+  document.getElementById('growthExpVal').textContent=ge+'%';
+  document.getElementById('progYearsVal').textContent=yrs+' jaar';
+  const baseInc=annInc(),baseExp=annExp()-annSav();
+  const labels=[document.getElementById('yrSel').value];
+  const incData=[baseInc],expData=[baseExp],savData=[annSav()],netData=[baseInc-baseExp];
+  for(let y=1;y<=yrs;y++){
+    const yr=parseInt(labels[0])+y;labels.push(yr+'');
+    const inc=baseInc*Math.pow(1+gi/100,y);
+    const exp=baseExp*Math.pow(1+ge/100,y);
+    const sav=inc-exp>0?inc-exp:0;
+    incData.push(inc);expData.push(exp);savData.push(sav);netData.push(inc-exp);
+  }
+  const acc=getAccent();
+  mkChart('cProg',{type:'line',data:{labels,datasets:[
+    {label:'Inkomen',data:incData,borderColor:'#10b981',backgroundColor:'rgba(16,185,129,.1)',fill:true,tension:.4,pointRadius:4},
+    {label:'Uitgaven',data:expData,borderColor:'#f43f5e',backgroundColor:'rgba(244,63,94,.08)',fill:true,tension:.4,pointRadius:4},
+    {label:'Gespaard',data:savData,borderColor:acc,backgroundColor:hexToRgbaLocal(acc,.12),fill:true,tension:.4,pointRadius:4},
+  ]},options:defOpts()});
+  const finalNet=netData[netData.length-1];
+  document.getElementById('prognoseStats').innerHTML=`
+    ${statLine('Verwacht inkomen (jaar '+yrs+')',eur(incData[incData.length-1]),'var(--pos)')}
+    ${statLine('Verwachte uitgaven (jaar '+yrs+')',eur(expData[expData.length-1]),'var(--neg)')}
+    ${statLine('Verwacht netto (jaar '+yrs+')',eur(finalNet),finalNet>=0?'var(--pos)':'var(--neg)')}
+    ${statLine('Totaal gespaard ('+yrs+' jaar)',eur(sum(savData)),'var(--a)')}
+  `;
+}
+
+// ══════════════════════════════════════════════════════════════════
+// EXPORT CSV
+// ══════════════════════════════════════════════════════════════════
+function exportCSV(){
+  let csv='Categorie,'+MN.join(',')+',Jaarlijks Totaal\n';
+  D.inkomen.forEach(it=>csv+=`"${it.lbl}",`+it.v.join(',')+','+rowSum(it)+'\n');
+  csv+='TOTAAL INKOMEN,'+MN.map((_,i)=>mIncome(i)).join(',')+','+annInc()+'\n';
+  D.cats.forEach(c=>{
+    csv+='\n';
+    c.items.forEach(it=>csv+=`"${it.lbl}",`+it.v.join(',')+','+rowSum(it)+'\n');
+    csv+=`"TOTAAL ${c.lbl}",`+MN.map((_,i)=>mCat(c,i)).join(',')+','+annCat(c)+'\n';
+  });
+  csv+='\nNETTO,'+MN.map((_,i)=>mIncome(i)-mExpenses(i)).join(',')+','+(annInc()-annExp())+'\n';
+  const a=document.createElement('a');
+  a.href='data:text/csv;charset=utf-8,\uFEFF'+encodeURIComponent(csv);
+  a.download='Budgetplanner_'+document.getElementById('yrSel').value+'.csv';
+  a.click();toast('CSV gedownload!');
+}
+
+// ══════════════════════════════════════════════════════════════════
+// RENDER ALL
+// ══════════════════════════════════════════════════════════════════
+function renderAll(){
+  renderKPIs();
+  renderProgress();
+  buildBarChart();
+  buildDonutChart();
+  buildGaugeChart();
+}
+function rebuildCharts(){
+  renderAll();
+  if(document.getElementById('pg-grafieken').classList.contains('on'))buildGrafiekenCharts();
+  if(document.getElementById('pg-maanden').classList.contains('on'))renderMonth();
+  if(document.getElementById('pg-prognose').classList.contains('on'))updatePrognose();
+}
+
+// ══════════════════════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════════════════════
+loadData();
+const t=localStorage.getItem('bp_theme')||'light';
+setTheme(t);
+buildTable();
+setTimeout(renderAll,80);
+</script>
+</body>
+</html>

@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="description" content="Gratis bruto netto calculator Nederland 2026. Bereken snel je nettosalaris op basis van je brutosalaris."/>
+<meta name="author" content="Aiman Mahgoub"/>
+<meta name="theme-color" content="#7c3aed"/>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧮</text></svg>"/>
+<title>Bruto Netto Calculator 2026 — Aiman Mahgoub</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300;12..96,400;12..96,500;12..96,700;12..96,800&family=Instrument+Serif:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'DM Sans',sans-serif;background:#09090f;color:#edebf5;min-height:100vh;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+
+/* Noise */
+body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:999;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");opacity:.5}
+
+/* Blobs */
+.blob{position:fixed;border-radius:50%;pointer-events:none;filter:blur(90px);opacity:.12;z-index:0}
+.b1{width:500px;height:500px;background:#7c3aed;top:-150px;right:-100px}
+.b2{width:350px;height:350px;background:#a3e635;bottom:-80px;left:-80px;opacity:.06}
+
+/* Cursor */
+.cur{position:fixed;width:7px;height:7px;border-radius:50%;background:#a78bfa;pointer-events:none;z-index:1000;transform:translate(-50%,-50%);mix-blend-mode:exclusion}
+.cur-r{position:fixed;width:30px;height:30px;border-radius:50%;border:1px solid rgba(167,139,250,.3);pointer-events:none;z-index:999;transform:translate(-50%,-50%);transition:left .1s,top .1s}
+
+/* Nav */
+nav{
+  position:sticky;top:0;z-index:200;
+  height:64px;display:flex;align-items:center;justify-content:space-between;
+  padding:0 48px;
+  background:rgba(9,9,15,.88);backdrop-filter:blur(20px);
+  border-bottom:1px solid rgba(124,58,237,.12);
+}
+.nav-logo{font-family:'Bricolage Grotesque',sans-serif;font-size:17px;font-weight:700;color:#edebf5;text-decoration:none;display:flex;align-items:center;gap:8px}
+.nav-dot{width:8px;height:8px;border-radius:50%;background:#7c3aed;box-shadow:0 0 12px #7c3aed}
+.nav-links{display:flex;gap:20px;align-items:center}
+.nav-back{display:flex;align-items:center;gap:7px;color:#6b6b8a;font-size:13.5px;text-decoration:none;transition:color .2s}
+.nav-back:hover{color:#a78bfa}
+.nav-pill{background:linear-gradient(135deg,#7c3aed,#6d28d9);color:#fff;padding:8px 20px;border-radius:99px;font-size:13px;font-weight:600;text-decoration:none;transition:all .2s;box-shadow:0 0 16px rgba(124,58,237,.3)}
+.nav-pill:hover{transform:translateY(-1px);box-shadow:0 0 28px rgba(124,58,237,.5)}
+
+/* Page wrap */
+.wrap{position:relative;z-index:1;padding:60px 24px 80px;max-width:900px;margin:0 auto}
+
+/* Header */
+.pg-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(124,58,237,.12);border:1px solid rgba(124,58,237,.25);border-radius:99px;padding:6px 14px;font-size:12px;font-weight:500;color:#a78bfa;margin-bottom:24px;letter-spacing:.3px}
+.pg-badge-dot{width:6px;height:6px;border-radius:50%;background:#a78bfa;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)}}
+.pg-h1{font-family:'Bricolage Grotesque',sans-serif;font-size:clamp(38px,5vw,62px);font-weight:800;letter-spacing:-2.5px;line-height:1.05;color:#edebf5;margin-bottom:10px}
+.pg-h1 em{font-family:'Instrument Serif',serif;font-style:italic;font-weight:400;color:transparent;background:linear-gradient(135deg,#a78bfa,#7c3aed);-webkit-background-clip:text;background-clip:text}
+.pg-sub{font-size:16px;font-weight:300;color:rgba(237,235,245,.5);margin-bottom:48px;line-height:1.6;max-width:520px}
+
+/* Card */
+.card{background:#151524;border:1px solid rgba(124,58,237,.14);border-radius:20px;overflow:hidden;box-shadow:0 8px 40px rgba(0,0,0,.3)}
+.card-section{padding:32px 36px;border-bottom:1px solid rgba(124,58,237,.08)}
+.card-section:last-child{border:none}
+.card-label{font-size:10.5px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#a78bfa;margin-bottom:20px;display:flex;align-items:center;gap:10px}
+.card-label::before{content:'';width:14px;height:1.5px;background:#7c3aed}
+
+/* Form grid */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.form-group{display:flex;flex-direction:column;gap:8px}
+.form-group.full{grid-column:span 2}
+.form-label{font-size:12.5px;font-weight:500;color:rgba(237,235,245,.6);letter-spacing:.2px}
+.form-label span{color:#6b6b8a;font-weight:400;margin-left:4px}
+
+/* Input */
+.inp-wrap{position:relative}
+.inp-prefix{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:15px;font-weight:500;color:#6b6b8a;pointer-events:none}
+.inp-suffix{position:absolute;right:14px;top:50%;transform:translateY(-50%);font-size:13px;color:#6b6b8a;pointer-events:none}
+input[type=number],input[type=text],select{
+  width:100%;background:#1e1e30;border:1.5px solid rgba(124,58,237,.15);
+  border-radius:12px;padding:13px 14px;
+  color:#edebf5;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:400;
+  outline:none;transition:border-color .2s,background .2s;
+  -webkit-appearance:none;appearance:none;
+}
+input[type=number]:focus,select:focus{border-color:#7c3aed;background:#221e36}
+.has-prefix input[type=number]{padding-left:32px}
+.has-suffix input[type=number]{padding-right:40px}
+input[type=number]::-webkit-outer-spin-button,input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
+select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='none' stroke='%236b6b8a' stroke-width='1.5' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:38px}
+select option{background:#1e1e30;color:#edebf5}
+
+/* Toggle pills */
+.pill-group{display:flex;background:#1e1e30;border-radius:99px;padding:4px;gap:4px;border:1px solid rgba(124,58,237,.12)}
+.pill-opt{flex:1;padding:9px 12px;border-radius:99px;border:none;background:transparent;color:#6b6b8a;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;font-family:'DM Sans',sans-serif;text-align:center}
+.pill-opt.on{background:linear-gradient(135deg,#7c3aed,#6d28d9);color:#fff;box-shadow:0 2px 12px rgba(124,58,237,.35)}
+
+/* Calc button */
+.btn-calc{
+  width:100%;background:linear-gradient(135deg,#7c3aed,#6d28d9);
+  color:#fff;border:none;border-radius:14px;padding:16px;
+  font-family:'Bricolage Grotesque',sans-serif;font-size:16px;font-weight:700;
+  letter-spacing:-.2px;cursor:pointer;transition:all .25s;
+  box-shadow:0 4px 24px rgba(124,58,237,.35);margin-top:8px;
+  display:flex;align-items:center;justify-content:center;gap:10px;
+}
+.btn-calc:hover{transform:translateY(-2px);box-shadow:0 8px 36px rgba(124,58,237,.5)}
+.btn-calc:active{transform:translateY(0)}
+
+/* Results */
+.results{display:none;padding:32px 36px}
+.results.show{display:block}
+
+/* Big result */
+.result-main{
+  background:linear-gradient(135deg,rgba(124,58,237,.12),rgba(109,40,217,.06));
+  border:1px solid rgba(124,58,237,.25);
+  border-radius:16px;padding:28px;margin-bottom:24px;
+  position:relative;overflow:hidden;
+}
+.result-main::before{content:'';position:absolute;top:-40px;right:-40px;width:140px;height:140px;border-radius:50%;background:rgba(124,58,237,.12);filter:blur(30px)}
+.result-main-label{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#a78bfa;margin-bottom:10px}
+.result-main-val{font-family:'Bricolage Grotesque',sans-serif;font-size:clamp(36px,5vw,56px);font-weight:800;letter-spacing:-2px;color:#edebf5;line-height:1;margin-bottom:6px}
+.result-main-val span{color:#a3e635}
+.result-main-sub{font-size:13px;color:rgba(237,235,245,.4)}
+
+/* Result grid */
+.result-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:24px}
+.result-item{background:#1e1e30;border-radius:12px;padding:18px 20px;border:1px solid rgba(124,58,237,.08);transition:border-color .2s}
+.result-item:hover{border-color:rgba(124,58,237,.25)}
+.result-item-label{font-size:11.5px;color:#6b6b8a;margin-bottom:6px;font-weight:400}
+.result-item-val{font-family:'Bricolage Grotesque',sans-serif;font-size:20px;font-weight:700;letter-spacing:-.5px}
+.result-item-val.pos{color:#a3e635}
+.result-item-val.neg{color:#f43f5e}
+.result-item-val.neu{color:#a78bfa}
+.result-item-val.muted{color:rgba(237,235,245,.6)}
+.result-item-sub{font-size:11px;color:#6b6b8a;margin-top:3px}
+
+/* Breakdown bar */
+.breakdown{margin-bottom:24px}
+.breakdown-title{font-size:12px;font-weight:600;color:rgba(237,235,245,.4);letter-spacing:.5px;text-transform:uppercase;margin-bottom:14px}
+.bar-stacked{height:14px;border-radius:99px;overflow:hidden;display:flex;margin-bottom:16px}
+.bar-seg{height:100%;transition:width 1s cubic-bezier(.4,0,.2,1)}
+.bar-legend{display:flex;flex-wrap:wrap;gap:12px}
+.bar-legend-item{display:flex;align-items:center;gap:7px;font-size:12px;color:rgba(237,235,245,.55)}
+.bar-legend-dot{width:10px;height:10px;border-radius:3px;flex-shrink:0}
+
+/* Monthly toggle */
+.per-toggle{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:8px}
+.per-toggle-label{font-size:12.5px;color:#6b6b8a}
+.per-toggle-pills{display:flex;background:#1e1e30;border-radius:99px;padding:3px;gap:3px}
+.per-btn{padding:5px 14px;border-radius:99px;border:none;background:transparent;color:#6b6b8a;font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;font-family:'DM Sans',sans-serif}
+.per-btn.on{background:rgba(124,58,237,.35);color:#a78bfa}
+
+/* Info note */
+.info-note{background:rgba(163,230,53,.06);border:1px solid rgba(163,230,53,.15);border-radius:12px;padding:14px 18px;font-size:12.5px;color:rgba(163,230,53,.7);line-height:1.6;display:flex;gap:10px;align-items:flex-start}
+.info-note svg{flex-shrink:0;margin-top:1px;opacity:.7}
+
+/* Footer */
+footer{position:relative;z-index:1;background:#09090f;border-top:1px solid rgba(124,58,237,.1);padding:32px 48px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px}
+.footer-logo{font-family:'Bricolage Grotesque',sans-serif;font-size:14px;font-weight:700;color:rgba(237,235,245,.3)}
+.footer-logo span{color:#7c3aed}
+.footer-note{font-size:11.5px;color:rgba(237,235,245,.2)}
+.footer-links{display:flex;gap:20px}
+.footer-links a{font-size:12px;color:rgba(237,235,245,.3);text-decoration:none;transition:color .2s}
+.footer-links a:hover{color:#a78bfa}
+
+/* Animations */
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.pg-badge{animation:fadeUp .6s ease .1s both}
+.pg-h1{animation:fadeUp .7s ease .2s both}
+.pg-sub{animation:fadeUp .7s ease .3s both}
+.card{animation:fadeUp .8s ease .35s both}
+
+/* Responsive */
+@media(max-width:640px){
+  nav{padding:0 20px}
+  .nav-links .nav-back span{display:none}
+  .wrap{padding:40px 16px 60px}
+  .card-section{padding:24px 20px}
+  .form-grid{grid-template-columns:1fr}
+  .form-group.full{grid-column:span 1}
+  .result-grid{grid-template-columns:1fr}
+  .results{padding:24px 20px}
+  footer{padding:24px 20px;flex-direction:column;align-items:flex-start}
+}
+</style>
+</head>
+<body>
+<div class="blob b1"></div>
+<div class="blob b2"></div>
+<div class="cur" id="cur"></div>
+<div class="cur-r" id="curR"></div>
+
+<!-- NAV -->
+<nav>
+  <a href="index.html" class="nav-logo"><span class="nav-dot"></span>Aiman Mahgoub</a>
+  <div class="nav-links">
+    <a href="index.html" class="nav-back">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+      <span>Terug</span>
+    </a>
+    <a href="planner.html" class="nav-pill">BudgetPlanner →</a>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<div class="wrap">
+  <div class="pg-badge"><span class="pg-badge-dot"></span>Gratis · Nederland 2026 · Belastingsjaar</div>
+  <h1 class="pg-h1">Bruto → <em>Netto</em><br>Calculator</h1>
+  <p class="pg-sub">Bereken direct je nettosalaris op basis van je brutosalaris. Gebaseerd op de Nederlandse belastingschijven en heffingskortingen van 2026.</p>
+
+  <div class="card">
+    <!-- INVOER -->
+    <div class="card-section">
+      <div class="card-label">Jouw gegevens</div>
+      <div class="form-grid">
+
+        <div class="form-group">
+          <label class="form-label">Brutosalaris <span>(maand of jaar)</span></label>
+          <div class="inp-wrap has-prefix">
+            <span class="inp-prefix">€</span>
+            <input type="number" id="bruto" placeholder="3500" min="0" step="50" oninput="calc()"/>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Per</label>
+          <div class="pill-group" id="perGroup">
+            <button class="pill-opt on" onclick="setPer('maand',this)">Maand</button>
+            <button class="pill-opt" onclick="setPer('jaar',this)">Jaar</button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Leeftijd</label>
+          <input type="number" id="leeftijd" placeholder="27" min="15" max="80" value="27" oninput="calc()"/>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Situatie</label>
+          <select id="situatie" onchange="calc()">
+            <option value="zonder">Zonder toeslagpartner</option>
+            <option value="met">Met toeslagpartner</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Vakantiegeld</label>
+          <div class="pill-group" id="vkGroup">
+            <button class="pill-opt on" onclick="setVk(true,this)">Inclusief (8%)</button>
+            <button class="pill-opt" onclick="setVk(false,this)">Exclusief</button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Pensioenaftrek <span>(% van bruto)</span></label>
+          <div class="inp-wrap has-suffix">
+            <input type="number" id="pensioen" placeholder="0" min="0" max="30" value="0" step="0.5" oninput="calc()"/>
+            <span class="inp-suffix">%</span>
+          </div>
+        </div>
+
+        <div class="form-group full">
+          <label class="form-label">Reiskostenvergoeding <span>(belastingvrij)</span></label>
+          <div class="inp-wrap has-prefix">
+            <span class="inp-prefix">€</span>
+            <input type="number" id="reiskosten" placeholder="0" min="0" step="10" value="0" oninput="calc()"/>
+          </div>
+        </div>
+
+      </div>
+      <button class="btn-calc" onclick="calc()">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M9 7H6a2 2 0 00-2 2v9a2 2 0 002 2h9a2 2 0 002-2v-3M13 3h8m0 0v8m0-8L11 13"/></svg>
+        Bereken nettosalaris
+      </button>
+    </div>
+
+    <!-- RESULTATEN -->
+    <div class="results" id="results">
+      <div class="per-toggle">
+        <span class="per-toggle-label">Weergave:</span>
+        <div class="per-toggle-pills">
+          <button class="per-btn on" onclick="setView('maand',this)">Per maand</button>
+          <button class="per-btn" onclick="setView('jaar',this)">Per jaar</button>
+          <button class="per-btn" onclick="setView('week',this)">Per week</button>
+        </div>
+      </div>
+
+      <!-- Netto hoofdresultaat -->
+      <div class="result-main">
+        <div class="result-main-label">Nettosalaris</div>
+        <div class="result-main-val" id="res-netto">€ —</div>
+        <div class="result-main-sub" id="res-netto-sub">—</div>
+      </div>
+
+      <!-- Grid -->
+      <div class="result-grid">
+        <div class="result-item">
+          <div class="result-item-label">Brutosalaris</div>
+          <div class="result-item-val muted" id="res-bruto">€ —</div>
+          <div class="result-item-sub" id="res-bruto-sub">—</div>
+        </div>
+        <div class="result-item">
+          <div class="result-item-label">Loonheffing</div>
+          <div class="result-item-val neg" id="res-loon">− € —</div>
+          <div class="result-item-sub" id="res-loon-pct">—% van bruto</div>
+        </div>
+        <div class="result-item">
+          <div class="result-item-label">Algemene heffingskorting</div>
+          <div class="result-item-val pos" id="res-ahk">+ € —</div>
+          <div class="result-item-sub">Aftrek van belasting</div>
+        </div>
+        <div class="result-item">
+          <div class="result-item-label">Arbeidskorting</div>
+          <div class="result-item-val pos" id="res-ark">+ € —</div>
+          <div class="result-item-sub">Aftrek van belasting</div>
+        </div>
+        <div class="result-item">
+          <div class="result-item-label">Pensioenaftrek</div>
+          <div class="result-item-val neg" id="res-pen">− € —</div>
+          <div class="result-item-sub" id="res-pen-sub">—</div>
+        </div>
+        <div class="result-item">
+          <div class="result-item-label">Effectief belastingtarief</div>
+          <div class="result-item-val neu" id="res-eff">—%</div>
+          <div class="result-item-sub">Van bruto naar netto</div>
+        </div>
+      </div>
+
+      <!-- Stacked bar -->
+      <div class="breakdown">
+        <div class="breakdown-title">Verdeling brutosalaris</div>
+        <div class="bar-stacked" id="barStacked">
+          <div class="bar-seg" id="seg-netto" style="background:#a78bfa;width:0%"></div>
+          <div class="bar-seg" id="seg-bel" style="background:#f43f5e;width:0%"></div>
+          <div class="bar-seg" id="seg-pen" style="background:#f59e0b;width:0%"></div>
+        </div>
+        <div class="bar-legend">
+          <div class="bar-legend-item"><div class="bar-legend-dot" style="background:#a78bfa"></div>Netto inkomen</div>
+          <div class="bar-legend-item"><div class="bar-legend-dot" style="background:#f43f5e"></div>Belasting &amp; premies</div>
+          <div class="bar-legend-item"><div class="bar-legend-dot" style="background:#f59e0b"></div>Pensioen</div>
+        </div>
+      </div>
+
+      <div class="info-note">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+        Berekening is gebaseerd op belastingschijven en heffingskortingen 2026. Resultaten zijn indicatief — voor exacte berekeningen raadpleeg een salarisspecialist.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">Aiman <span>Mahgoub</span></div>
+  <div class="footer-note">Gratis · Maatschappelijk initiatief · 2026</div>
+  <div class="footer-links">
+    <a href="index.html">Home</a>
+    <a href="planner.html">BudgetPlanner</a>
+    <a href="https://nl.linkedin.com/in/aiman-m-9154b9114" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:5px;font-size:12px;color:rgba(237,235,245,.3);text-decoration:none;transition:color .2s" onmouseover="this.style.color='#a78bfa'" onmouseout="this.style.color='rgba(237,235,245,.3)'"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>LinkedIn</a>
+  </div>
+</footer>
+
+<script>
+// Cursor
+const cur=document.getElementById('cur'),curR=document.getElementById('curR');
+let tx=0,ty=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{tx=e.clientX;ty=e.clientY;cur.style.left=tx+'px';cur.style.top=ty+'px'});
+(function loop(){rx+=(tx-rx)*.1;ry+=(ty-ry)*.1;curR.style.left=rx+'px';curR.style.top=ry+'px';requestAnimationFrame(loop)})();
+
+// State
+let perInput='maand', inclVk=true, viewMode='maand';
+let lastResult=null;
+
+function setPer(v,el){perInput=v;document.querySelectorAll('#perGroup .pill-opt').forEach(b=>b.classList.remove('on'));el.classList.add('on');calc()}
+function setVk(v,el){inclVk=v;document.querySelectorAll('#vkGroup .pill-opt').forEach(b=>b.classList.remove('on'));el.classList.add('on');calc()}
+function setView(v,el){viewMode=v;document.querySelectorAll('.per-btn').forEach(b=>b.classList.remove('on'));el.classList.add('on');if(lastResult)renderResult(lastResult)}
+
+function eur(v){return '€\u00A0'+Math.round(v).toLocaleString('nl-NL')}
+function eurD(v){return '€\u00A0'+v.toLocaleString('nl-NL',{minimumFractionDigits:0,maximumFractionDigits:0})}
+
+// ── DUTCH TAX 2026 ──────────────────────────────────────────────────
+function calcTax(brutoJaar) {
+  // Schijven 2026
+  const S1_MAX = 38441;
+  const S1_RATE = 0.3582;   // incl AOW/premies
+  const S2_RATE = 0.4950;
+
+  let belasting = 0;
+  if (brutoJaar <= S1_MAX) {
+    belasting = brutoJaar * S1_RATE;
+  } else {
+    belasting = S1_MAX * S1_RATE + (brutoJaar - S1_MAX) * S2_RATE;
+  }
+
+  // Algemene heffingskorting 2026
+  // Max €3.362, afgebouwd boven €24.812 met 6,630%
+  let ahk = 0;
+  if (brutoJaar <= 24812) {
+    ahk = 3362;
+  } else if (brutoJaar <= 75518) {
+    ahk = 3362 - (brutoJaar - 24812) * 0.06630;
+  } else {
+    ahk = 0;
+  }
+  ahk = Math.max(0, ahk);
+
+  // Arbeidskorting 2026
+  // Opbouw tot €24.812: 8,231% → max €5.052
+  // Afbouw boven €39.957: 6,51% tot €0 boven ~€124.934
+  let ark = 0;
+  if (brutoJaar <= 10741) {
+    ark = brutoJaar * 0.08231;
+  } else if (brutoJaar <= 24812) {
+    ark = 884 + (brutoJaar - 10741) * 0.29861;
+  } else if (brutoJaar <= 39957) {
+    ark = 5052;
+  } else if (brutoJaar <= 124935) {
+    ark = 5052 - (brutoJaar - 39957) * 0.06510;
+  } else {
+    ark = 0;
+  }
+  ark = Math.max(0, ark);
+
+  const nettoBelasting = Math.max(0, belasting - ahk - ark);
+  return { belasting, ahk, ark, nettoBelasting };
+}
+
+function calc() {
+  const raw = parseFloat(document.getElementById('bruto').value) || 0;
+  if (raw <= 0) { document.getElementById('results').classList.remove('show'); return; }
+
+  const pensioenPct = parseFloat(document.getElementById('pensioen').value) || 0;
+  const reiskosten  = parseFloat(document.getElementById('reiskosten').value) || 0;
+
+  // Normalize to jaar
+  let brutoJaar = perInput === 'maand' ? raw * (inclVk ? 12.96 : 12) : raw;
+
+  // Pensioen aftrek (voor belasting)
+  const pensioenJaar = brutoJaar * (pensioenPct / 100);
+  const fiscaalJaar  = Math.max(0, brutoJaar - pensioenJaar);
+
+  const { belasting, ahk, ark, nettoBelasting } = calcTax(fiscaalJaar);
+
+  const nettoJaar = brutoJaar - nettoBelasting - pensioenJaar + reiskosten * 12;
+  const nettoMnd  = nettoJaar / (inclVk ? 12.96 : 12);
+  const nettoWk   = nettoJaar / 52;
+  const brutoMnd  = perInput === 'maand' ? raw : raw / (inclVk ? 12.96 : 12);
+  const effTarief = brutoJaar > 0 ? (nettoBelasting / brutoJaar) * 100 : 0;
+
+  lastResult = {
+    brutoJaar, brutoMnd,
+    nettoJaar, nettoMnd, nettoWk,
+    nettoBelasting, pensioenJaar,
+    ahk, ark, belasting,
+    effTarief, inclVk, reiskosten
+  };
+
+  renderResult(lastResult);
+  document.getElementById('results').classList.add('show');
+}
+
+function renderResult(r) {
+  const factor = viewMode === 'maand' ? 1/(r.inclVk?12.96:12)
+               : viewMode === 'jaar'  ? 1
+               : 1/52;
+
+  const lbl = viewMode === 'maand' ? 'per maand'
+            : viewMode === 'jaar'  ? 'per jaar'
+            : 'per week';
+
+  const nettoVal = viewMode === 'maand' ? r.nettoMnd
+                 : viewMode === 'jaar'  ? r.nettoJaar
+                 : r.nettoWk;
+
+  document.getElementById('res-netto').innerHTML = eur(nettoVal).replace('€','€ <span>').replace(/(\d[\d\s\.,]*)$/, m => m + '</span>');
+  document.getElementById('res-netto').innerHTML = `€ <span>${Math.round(nettoVal).toLocaleString('nl-NL')}</span>`;
+  document.getElementById('res-netto-sub').textContent = lbl;
+
+  document.getElementById('res-bruto').textContent = eur(r.brutoJaar * factor);
+  document.getElementById('res-bruto-sub').textContent = lbl;
+  document.getElementById('res-loon').textContent  = '− ' + eur(r.nettoBelasting * factor);
+  document.getElementById('res-loon-pct').textContent = r.effTarief.toFixed(1) + '% van bruto';
+  document.getElementById('res-ahk').textContent = '+ ' + eur(r.ahk * factor);
+  document.getElementById('res-ark').textContent = '+ ' + eur(r.ark * factor);
+  document.getElementById('res-pen').textContent  = '− ' + eur(r.pensioenJaar * factor);
+  document.getElementById('res-pen-sub').textContent = r.pensioenJaar > 0 ? 'Fiscaal aftrekbaar' : 'Niet ingesteld';
+  document.getElementById('res-eff').textContent = r.effTarief.toFixed(1) + '%';
+
+  // Stacked bar
+  const total = r.brutoJaar;
+  const nPct  = Math.max(0, Math.min(100, ((r.nettoJaar - (r.reiskosten*12)) / total) * 100));
+  const bPct  = Math.max(0, Math.min(100, (r.nettoBelasting / total) * 100));
+  const pPct  = Math.max(0, Math.min(100, (r.pensioenJaar / total) * 100));
+
+  setTimeout(() => {
+    document.getElementById('seg-netto').style.width = nPct + '%';
+    document.getElementById('seg-bel').style.width   = bPct + '%';
+    document.getElementById('seg-pen').style.width   = pPct + '%';
+  }, 50);
+}
+
+// Run on load if there's a value
+document.getElementById('bruto').addEventListener('keydown', e => { if(e.key==='Enter') calc() });
+</script>
+</body>
+</html>

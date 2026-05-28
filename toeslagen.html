@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="description" content="Gratis toeslagen calculator Nederland 2026. Bereken zorgtoeslag, huurtoeslag, kinderbijslag, kinderopvangtoeslag en kindgebonden budget."/>
+<meta name="author" content="Aiman Mahgoub"/>
+<meta name="theme-color" content="#7c3aed"/>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏛️</text></svg>"/>
+<title>Toeslagen Calculator 2026 — Aiman Mahgoub</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300;12..96,400;12..96,500;12..96,700;12..96,800&family=Instrument+Serif:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'DM Sans',sans-serif;background:#09090f;color:#edebf5;min-height:100vh;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:999;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");opacity:.5}
+
+.blob{position:fixed;border-radius:50%;pointer-events:none;filter:blur(90px);z-index:0}
+.b1{width:500px;height:500px;background:#7c3aed;top:-150px;left:-100px;opacity:.12}
+.b2{width:400px;height:400px;background:#a3e635;bottom:-100px;right:-80px;opacity:.06}
+.b3{width:300px;height:300px;background:#06d6a0;top:40%;right:10%;opacity:.05}
+
+/* Cursor */
+.cur{position:fixed;width:7px;height:7px;border-radius:50%;background:#a78bfa;pointer-events:none;z-index:1000;transform:translate(-50%,-50%);mix-blend-mode:exclusion}
+.cur-r{position:fixed;width:30px;height:30px;border-radius:50%;border:1px solid rgba(167,139,250,.3);pointer-events:none;z-index:999;transform:translate(-50%,-50%);transition:left .1s,top .1s}
+
+/* Nav */
+nav{position:sticky;top:0;z-index:200;height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 48px;background:rgba(9,9,15,.9);backdrop-filter:blur(20px);border-bottom:1px solid rgba(124,58,237,.12)}
+.nav-logo{font-family:'Bricolage Grotesque',sans-serif;font-size:17px;font-weight:700;color:#edebf5;text-decoration:none;display:flex;align-items:center;gap:8px}
+.nav-dot{width:8px;height:8px;border-radius:50%;background:#7c3aed;box-shadow:0 0 12px #7c3aed}
+.nav-links{display:flex;gap:16px;align-items:center}
+.nav-back{display:flex;align-items:center;gap:7px;color:#6b6b8a;font-size:13.5px;text-decoration:none;transition:color .2s}
+.nav-back:hover{color:#a78bfa}
+.nav-pill{background:linear-gradient(135deg,#7c3aed,#6d28d9);color:#fff;padding:8px 20px;border-radius:99px;font-size:13px;font-weight:600;text-decoration:none;transition:all .2s;box-shadow:0 0 16px rgba(124,58,237,.3)}
+.nav-pill:hover{transform:translateY(-1px);box-shadow:0 0 28px rgba(124,58,237,.5)}
+
+/* Layout */
+.wrap{position:relative;z-index:1;padding:56px 24px 80px;max-width:1080px;margin:0 auto}
+
+/* Header */
+.pg-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(124,58,237,.12);border:1px solid rgba(124,58,237,.25);border-radius:99px;padding:6px 14px;font-size:12px;font-weight:500;color:#a78bfa;margin-bottom:22px;letter-spacing:.3px}
+.pg-badge-dot{width:6px;height:6px;border-radius:50%;background:#a78bfa;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)}}
+.pg-h1{font-family:'Bricolage Grotesque',sans-serif;font-size:clamp(36px,5vw,62px);font-weight:800;letter-spacing:-2.5px;line-height:1.05;color:#edebf5;margin-bottom:10px}
+.pg-h1 em{font-family:'Instrument Serif',serif;font-style:italic;font-weight:400;color:transparent;background:linear-gradient(135deg,#a78bfa,#7c3aed);-webkit-background-clip:text;background-clip:text}
+.pg-sub{font-size:16px;font-weight:300;color:rgba(237,235,245,.45);margin-bottom:44px;line-height:1.65;max-width:560px}
+
+/* Situatie card */
+.sit-card{background:#151524;border:1px solid rgba(124,58,237,.14);border-radius:20px;overflow:hidden;margin-bottom:24px}
+.sit-head{padding:24px 32px;border-bottom:1px solid rgba(124,58,237,.08);display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.sit-title{font-family:'Bricolage Grotesque',sans-serif;font-size:16px;font-weight:700;color:#edebf5;letter-spacing:-.3px;display:flex;align-items:center;gap:10px}
+.sit-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.sit-body{padding:28px 32px}
+
+/* Form elements */
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+.form-row.cols3{grid-template-columns:1fr 1fr 1fr}
+.form-row.single{grid-template-columns:1fr}
+.form-g{display:flex;flex-direction:column;gap:7px}
+.form-lbl{font-size:12px;font-weight:600;color:rgba(237,235,245,.5);letter-spacing:.3px}
+.form-lbl .hint{font-weight:400;color:#6b6b8a;margin-left:4px}
+.inp-w{position:relative}
+.inp-pre{position:absolute;left:13px;top:50%;transform:translateY(-50%);font-size:14px;color:#6b6b8a;pointer-events:none;font-weight:500}
+.inp-suf{position:absolute;right:13px;top:50%;transform:translateY(-50%);font-size:13px;color:#6b6b8a;pointer-events:none}
+input[type=number],input[type=range],select{width:100%;background:#1e1e30;border:1.5px solid rgba(124,58,237,.14);border-radius:11px;padding:12px 13px;color:#edebf5;font-family:'DM Sans',sans-serif;font-size:14.5px;outline:none;transition:border-color .2s,background .2s;-webkit-appearance:none;appearance:none}
+input[type=number]:focus,select:focus{border-color:#7c3aed;background:#1e1a2e}
+.has-pre input{padding-left:30px}
+.has-suf input{padding-right:36px}
+input[type=number]::-webkit-outer-spin-button,input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
+select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath fill='none' stroke='%236b6b8a' stroke-width='1.5' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 13px center;padding-right:36px;cursor:pointer}
+select option{background:#1e1e30}
+
+/* Toggle */
+.pill-g{display:flex;background:#1e1e30;border-radius:99px;padding:3px;gap:3px;border:1px solid rgba(124,58,237,.1)}
+.pill-o{flex:1;padding:8px 10px;border-radius:99px;border:none;background:transparent;color:#6b6b8a;font-size:12.5px;font-weight:600;cursor:pointer;transition:all .18s;font-family:'DM Sans',sans-serif;text-align:center;white-space:nowrap}
+.pill-o.on{background:linear-gradient(135deg,#7c3aed,#6d28d9);color:#fff;box-shadow:0 2px 10px rgba(124,58,237,.35)}
+
+/* Children counter */
+.child-counter{display:flex;align-items:center;gap:12px}
+.counter-btn{width:36px;height:36px;border-radius:99px;border:1.5px solid rgba(124,58,237,.25);background:transparent;color:#a78bfa;font-size:20px;font-weight:300;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0;line-height:1}
+.counter-btn:hover{background:rgba(124,58,237,.12);border-color:rgba(124,58,237,.4)}
+.counter-val{font-family:'Bricolage Grotesque',sans-serif;font-size:28px;font-weight:800;color:#edebf5;min-width:32px;text-align:center;letter-spacing:-1px}
+
+/* Child age rows */
+.child-ages{display:flex;flex-direction:column;gap:10px;margin-top:14px}
+.child-age-row{display:flex;align-items:center;gap:12px;background:#1e1e30;border:1px solid rgba(124,58,237,.1);border-radius:11px;padding:12px 16px}
+.child-age-lbl{font-size:13px;font-weight:500;color:rgba(237,235,245,.6);min-width:70px}
+.child-age-sel{flex:1;background:transparent;border:none;color:#edebf5;font-family:'DM Sans',sans-serif;font-size:14px;outline:none;cursor:pointer;padding:0}
+
+/* Calc button */
+.btn-calc{width:100%;background:linear-gradient(135deg,#7c3aed,#6d28d9);color:#fff;border:none;border-radius:14px;padding:16px;font-family:'Bricolage Grotesque',sans-serif;font-size:16px;font-weight:700;cursor:pointer;transition:all .25s;box-shadow:0 4px 24px rgba(124,58,237,.35);margin-top:8px;display:flex;align-items:center;justify-content:center;gap:10px}
+.btn-calc:hover{transform:translateY(-2px);box-shadow:0 8px 36px rgba(124,58,237,.5)}
+
+/* Results */
+.results-wrap{display:none}
+.results-wrap.show{display:block}
+
+/* Total banner */
+.total-banner{background:linear-gradient(135deg,rgba(124,58,237,.18),rgba(163,230,53,.08));border:1px solid rgba(124,58,237,.3);border-radius:20px;padding:32px 36px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;position:relative;overflow:hidden}
+.total-banner::before{content:'';position:absolute;top:-60px;right:-60px;width:200px;height:200px;border-radius:50%;background:rgba(124,58,237,.15);filter:blur(40px)}
+.total-main{}
+.total-lbl{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#a78bfa;margin-bottom:8px}
+.total-val{font-family:'Bricolage Grotesque',sans-serif;font-size:clamp(42px,6vw,68px);font-weight:800;letter-spacing:-3px;color:#edebf5;line-height:1}
+.total-val em{color:#a3e635;font-style:normal}
+.total-sub{font-size:13px;color:rgba(237,235,245,.4);margin-top:6px}
+.total-year{text-align:right}
+.total-year-val{font-family:'Bricolage Grotesque',sans-serif;font-size:28px;font-weight:700;color:rgba(237,235,245,.6);letter-spacing:-1px}
+.total-year-lbl{font-size:12px;color:#6b6b8a;margin-top:3px}
+
+/* Results grid */
+.res-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
+.res-card{background:#151524;border-radius:16px;border:1px solid rgba(124,58,237,.1);overflow:hidden;transition:all .25s;position:relative}
+.res-card:hover{border-color:rgba(124,58,237,.28);transform:translateY(-2px);box-shadow:0 8px 32px rgba(0,0,0,.25)}
+.res-card.zero{opacity:.45}
+.res-card-top{padding:20px 20px 16px;border-bottom:1px solid rgba(124,58,237,.07)}
+.res-card-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;margin-bottom:14px;border:1px solid}
+.res-card-name{font-size:12.5px;font-weight:700;color:rgba(237,235,245,.7);letter-spacing:.2px;margin-bottom:3px}
+.res-card-desc{font-size:11px;color:#6b6b8a;line-height:1.4}
+.res-card-bottom{padding:16px 20px}
+.res-card-amount{font-family:'Bricolage Grotesque',sans-serif;font-size:24px;font-weight:800;letter-spacing:-1px;margin-bottom:3px}
+.res-card-per{font-size:11px;color:#6b6b8a}
+.res-card-bar{height:3px;background:rgba(255,255,255,.06);margin-top:10px;border-radius:99px;overflow:hidden}
+.res-card-bar-fill{height:100%;border-radius:99px;transition:width 1.2s cubic-bezier(.4,0,.2,1)}
+.res-card.zero .res-card-amount{color:rgba(237,235,245,.25)!important}
+
+/* Eligible badge */
+.elig{display:inline-flex;align-items:center;gap:5px;font-size:10.5px;font-weight:700;letter-spacing:.5px;padding:3px 9px;border-radius:99px;margin-bottom:10px}
+.elig.yes{background:rgba(163,230,53,.1);color:#a3e635;border:1px solid rgba(163,230,53,.2)}
+.elig.no{background:rgba(244,63,94,.07);color:rgba(244,63,94,.6);border:1px solid rgba(244,63,94,.12)}
+.elig.yes::before{content:'✓ '}
+.elig.no::before{content:'✕ '}
+
+/* Breakdown table */
+.breakdown-card{background:#151524;border:1px solid rgba(124,58,237,.1);border-radius:16px;overflow:hidden;margin-bottom:20px}
+.breakdown-head{padding:18px 24px;border-bottom:1px solid rgba(124,58,237,.08);font-family:'Bricolage Grotesque',sans-serif;font-size:14px;font-weight:700;color:#edebf5;display:flex;align-items:center;gap:8px}
+.breakdown-row{display:flex;align-items:center;justify-content:space-between;padding:14px 24px;border-bottom:1px solid rgba(124,58,237,.05);transition:background .15s;gap:12px;flex-wrap:wrap}
+.breakdown-row:last-child{border:none}
+.breakdown-row:hover{background:rgba(124,58,237,.04)}
+.breakdown-name{font-size:13.5px;font-weight:500;color:rgba(237,235,245,.75);display:flex;align-items:center;gap:8px}
+.breakdown-right{display:flex;align-items:center;gap:16px}
+.breakdown-month{font-family:'Bricolage Grotesque',sans-serif;font-size:16px;font-weight:700;letter-spacing:-.3px}
+.breakdown-year{font-size:12px;color:#6b6b8a}
+.breakdown-total{background:rgba(124,58,237,.08);border-top:1px solid rgba(124,58,237,.15)}
+.breakdown-total .breakdown-name{font-weight:700;color:#edebf5}
+.breakdown-total .breakdown-month{color:#a3e635;font-size:20px}
+
+/* Info note */
+.info-note{background:rgba(163,230,53,.05);border:1px solid rgba(163,230,53,.14);border-radius:12px;padding:14px 18px;font-size:12.5px;color:rgba(163,230,53,.65);line-height:1.65;display:flex;gap:10px;align-items:flex-start;margin-bottom:20px}
+.info-note svg{flex-shrink:0;margin-top:2px}
+
+/* Divider label */
+.divider-lbl{display:flex;align-items:center;gap:12px;margin:28px 0 20px;font-size:10.5px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#6b6b8a}
+.divider-lbl::before,.divider-lbl::after{content:'';flex:1;height:1px;background:rgba(124,58,237,.1)}
+
+/* Footer */
+footer{position:relative;z-index:1;background:#09090f;border-top:1px solid rgba(124,58,237,.1);padding:32px 48px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px}
+.footer-logo{font-family:'Bricolage Grotesque',sans-serif;font-size:14px;font-weight:700;color:rgba(237,235,245,.3)}
+.footer-logo span{color:#7c3aed}
+.footer-note{font-size:11.5px;color:rgba(237,235,245,.2)}
+.footer-links{display:flex;gap:20px}
+.footer-links a{font-size:12px;color:rgba(237,235,245,.3);text-decoration:none;transition:color .2s}
+.footer-links a:hover{color:#a78bfa}
+
+/* Animations */
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.pg-badge{animation:fadeUp .6s ease .1s both}
+.pg-h1{animation:fadeUp .7s ease .2s both}
+.pg-sub{animation:fadeUp .7s ease .3s both}
+.sit-card{animation:fadeUp .75s ease both}
+.sit-card:nth-child(2){animation-delay:.05s}
+.sit-card:nth-child(3){animation-delay:.1s}
+.sit-card:nth-child(4){animation-delay:.15s}
+.sit-card:nth-child(5){animation-delay:.2s}
+
+/* Responsive */
+@media(max-width:768px){
+  nav{padding:0 20px}
+  .nav-back span{display:none}
+  .wrap{padding:36px 16px 60px}
+  .sit-head{padding:18px 20px}
+  .sit-body{padding:20px 20px}
+  .form-row{grid-template-columns:1fr}
+  .form-row.cols3{grid-template-columns:1fr}
+  .res-grid{grid-template-columns:1fr 1fr}
+  .total-banner{padding:24px}
+  .total-val{font-size:44px}
+  .breakdown-row{flex-direction:column;align-items:flex-start;gap:4px}
+  footer{padding:24px 20px;flex-direction:column;align-items:flex-start}
+}
+@media(max-width:480px){
+  .res-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
+<div class="cur" id="cur"></div><div class="cur-r" id="curR"></div>
+
+<!-- NAV -->
+<nav>
+  <a href="index.html" class="nav-logo"><span class="nav-dot"></span>Aiman Mahgoub</a>
+  <div class="nav-links">
+    <a href="index.html" class="nav-back"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 12H5M12 5l-7 7 7 7"/></svg><span>Terug</span></a>
+    <a href="planner.html" class="nav-pill">BudgetPlanner →</a>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<div class="wrap">
+  <div class="pg-badge"><span class="pg-badge-dot"></span>Gratis · Nederland 2026 · Alle toeslagen</div>
+  <h1 class="pg-h1">Toeslagen<br><em>Calculator</em></h1>
+  <p class="pg-sub">Bereken in één overzicht alle toeslagen waar je recht op hebt. Zorgtoeslag, huurtoeslag, kinderbijslag, kinderopvangtoeslag en kindgebonden budget — gebaseerd op 2026.</p>
+
+  <!-- 1. PERSOONLIJKE SITUATIE -->
+  <div class="sit-card">
+    <div class="sit-head">
+      <div class="sit-title"><div class="sit-icon" style="background:rgba(124,58,237,.1);border:1px solid rgba(124,58,237,.2)">👤</div>Persoonlijke situatie</div>
+    </div>
+    <div class="sit-body">
+      <div class="form-row">
+        <div class="form-g">
+          <label class="form-lbl">Situatie</label>
+          <select id="situatie" onchange="updateSituatie()">
+            <option value="single">Alleenstaand</option>
+            <option value="partner">Met toeslagpartner</option>
+          </select>
+        </div>
+        <div class="form-g">
+          <label class="form-lbl">Leeftijd</label>
+          <input type="number" id="leeftijd" value="27" min="18" max="80" oninput="updateUI()"/>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-g">
+          <label class="form-lbl">Jouw jaarinkomen (bruto) <span class="hint">€</span></label>
+          <div class="inp-w has-pre"><span class="inp-pre">€</span><input type="number" id="inkomen1" placeholder="35000" min="0" step="500" oninput="updateUI()"/></div>
+        </div>
+        <div class="form-g" id="inkomen2wrap">
+          <label class="form-lbl">Inkomen partner (bruto) <span class="hint">€</span></label>
+          <div class="inp-w has-pre"><span class="inp-pre">€</span><input type="number" id="inkomen2" placeholder="0" min="0" step="500" oninput="updateUI()"/></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. WONEN -->
+  <div class="sit-card">
+    <div class="sit-head">
+      <div class="sit-title"><div class="sit-icon" style="background:rgba(6,214,160,.08);border:1px solid rgba(6,214,160,.18)">🏠</div>Wonen</div>
+    </div>
+    <div class="sit-body">
+      <div class="form-row">
+        <div class="form-g">
+          <label class="form-lbl">Woonsituatie</label>
+          <select id="woonsituatie" onchange="updateUI()">
+            <option value="huur">Huurwoning</option>
+            <option value="koop">Koopwoning / anders</option>
+          </select>
+        </div>
+        <div class="form-g" id="huurwrap">
+          <label class="form-lbl">Kale huurprijs per maand <span class="hint">excl. servicekosten</span></label>
+          <div class="inp-w has-pre"><span class="inp-pre">€</span><input type="number" id="huur" placeholder="750" min="0" max="1200" step="5" oninput="updateUI()"/></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. ZORGVERZEKERING -->
+  <div class="sit-card">
+    <div class="sit-head">
+      <div class="sit-title"><div class="sit-icon" style="background:rgba(249,115,22,.08);border:1px solid rgba(249,115,22,.18)">🏥</div>Zorgverzekering</div>
+    </div>
+    <div class="sit-body">
+      <div class="form-row">
+        <div class="form-g">
+          <label class="form-lbl">Heb je een basisverzekering?</label>
+          <div class="pill-g">
+            <button class="pill-o on" onclick="setPill('zorgverzekerd','ja',this)">Ja</button>
+            <button class="pill-o" onclick="setPill('zorgverzekerd','nee',this)">Nee</button>
+          </div>
+        </div>
+        <div class="form-g">
+          <label class="form-lbl">Maandpremie verzekering <span class="hint">basisverzekering</span></label>
+          <div class="inp-w has-pre"><span class="inp-pre">€</span><input type="number" id="zorgpremie" value="145" min="0" max="500" step="1" oninput="updateUI()"/></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. KINDEREN -->
+  <div class="sit-card">
+    <div class="sit-head">
+      <div class="sit-title"><div class="sit-icon" style="background:rgba(163,230,53,.08);border:1px solid rgba(163,230,53,.18)">👶</div>Kinderen</div>
+    </div>
+    <div class="sit-body">
+      <div class="form-row single">
+        <div class="form-g">
+          <label class="form-lbl">Aantal kinderen jonger dan 18</label>
+          <div class="child-counter">
+            <button class="counter-btn" onclick="changeChildren(-1)">−</button>
+            <span class="counter-val" id="childCount">0</span>
+            <button class="counter-btn" onclick="changeChildren(1)">+</button>
+            <span style="font-size:13px;color:#6b6b8a;margin-left:4px">kinderen</span>
+          </div>
+        </div>
+      </div>
+      <div class="child-ages" id="childAges"></div>
+    </div>
+  </div>
+
+  <!-- 5. KINDEROPVANG -->
+  <div class="sit-card" id="opvangCard" style="display:none">
+    <div class="sit-head">
+      <div class="sit-title"><div class="sit-icon" style="background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.18)">🏫</div>Kinderopvang</div>
+    </div>
+    <div class="sit-body">
+      <div class="form-row">
+        <div class="form-g">
+          <label class="form-lbl">Gebruik je kinderopvang?</label>
+          <div class="pill-g">
+            <button class="pill-o on" onclick="setPill('opvang','ja',this)">Ja</button>
+            <button class="pill-o" onclick="setPill('opvang','nee',this)">Nee</button>
+          </div>
+        </div>
+        <div class="form-g">
+          <label class="form-lbl">Type opvang</label>
+          <select id="opvangType" onchange="updateUI()">
+            <option value="dagopvang">Dagopvang (0–4 jaar)</option>
+            <option value="bso">Buitenschoolse opvang (BSO)</option>
+            <option value="gastouder">Gastouderopvang</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-g">
+          <label class="form-lbl">Uren opvang per maand</label>
+          <div class="inp-w has-suf"><input type="number" id="opvangUren" value="120" min="0" max="400" step="10" oninput="updateUI()"/><span class="inp-suf">uur</span></div>
+        </div>
+        <div class="form-g">
+          <label class="form-lbl">Uurtarief opvang</label>
+          <div class="inp-w has-pre"><span class="inp-pre">€</span><input type="number" id="opvangTarief" value="9.12" min="0" max="25" step="0.01" oninput="updateUI()"/></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BUTTON -->
+  <button class="btn-calc" onclick="calcAll()">
+    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M9 7H6a2 2 0 00-2 2v9a2 2 0 002 2h9a2 2 0 002-2v-3M13 3h8m0 0v8m0-8L11 13"/></svg>
+    Bereken mijn toeslagen
+  </button>
+
+  <!-- RESULTS -->
+  <div class="results-wrap" id="results">
+
+    <div class="divider-lbl">Jouw resultaten</div>
+
+    <!-- Total banner -->
+    <div class="total-banner">
+      <div class="total-main">
+        <div class="total-lbl">Totaal per maand</div>
+        <div class="total-val">€ <em id="totalMnd">0</em></div>
+        <div class="total-sub">Gecombineerd alle toeslagen en bijdragen</div>
+      </div>
+      <div class="total-year">
+        <div class="total-year-val" id="totalJaar">€ 0</div>
+        <div class="total-year-lbl">Per jaar</div>
+      </div>
+    </div>
+
+    <!-- Cards per toeslag -->
+    <div class="res-grid" id="resGrid"></div>
+
+    <!-- Breakdown table -->
+    <div class="breakdown-card">
+      <div class="breakdown-head">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+        Gedetailleerd overzicht
+      </div>
+      <div id="breakdownRows"></div>
+    </div>
+
+    <div class="info-note">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+      Berekeningen zijn gebaseerd op de normen en grenzen van 2026 en zijn indicatief. Werkelijke toeslagen kunnen afwijken door inkomensmutaties gedurende het jaar. Controleer altijd via <strong>mijn.toeslagen.nl</strong>.
+    </div>
+
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">Aiman <span>Mahgoub</span></div>
+  <div class="footer-note">Gratis · Maatschappelijk initiatief · 2026</div>
+  <div class="footer-links">
+    <a href="index.html">Home</a>
+    <a href="planner.html">BudgetPlanner</a>
+    <a href="bruto-netto.html">Bruto→Netto</a>
+    <a href="https://nl.linkedin.com/in/aiman-m-9154b9114" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:5px;font-size:12px;color:rgba(237,235,245,.3);text-decoration:none;transition:color .2s" onmouseover="this.style.color='#a78bfa'" onmouseout="this.style.color='rgba(237,235,245,.3)'"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>LinkedIn</a>
+  </div>
+</footer>
+
+<script>
+// ── Cursor ──────────────────────────────────────────────────────
+const cur=document.getElementById('cur'),curR=document.getElementById('curR');
+let tx=0,ty=0;
+document.addEventListener('mousemove',e=>{tx=e.clientX;ty=e.clientY;cur.style.left=tx+'px';cur.style.top=ty+'px'});
+(function loop(){curR.style.left=tx+'px';curR.style.top=ty+'px';requestAnimationFrame(loop)})();
+
+// ── State ────────────────────────────────────────────────────────
+const S={
+  situatie:'single',zorgverzekerd:'ja',opvang:'ja',
+  nKinderen:0,kinderLeeftijden:[],
+};
+
+// ── Pill toggle ──────────────────────────────────────────────────
+function setPill(key,val,el){
+  S[key]=val;
+  const grp=el.parentElement;
+  grp.querySelectorAll('.pill-o').forEach(b=>b.classList.remove('on'));
+  el.classList.add('on');
+  updateUI();
+}
+
+// ── Situatie ─────────────────────────────────────────────────────
+function updateSituatie(){
+  S.situatie=document.getElementById('situatie').value;
+  document.getElementById('inkomen2wrap').style.display=S.situatie==='partner'?'':'none';
+  updateUI();
+}
+
+// ── Children ────────────────────────────────────────────────────
+function changeChildren(d){
+  S.nKinderen=Math.max(0,Math.min(8,S.nKinderen+d));
+  document.getElementById('childCount').textContent=S.nKinderen;
+  // Sync leeftijden array
+  while(S.kinderLeeftijden.length<S.nKinderen)S.kinderLeeftijden.push(3);
+  S.kinderLeeftijden=S.kinderLeeftijden.slice(0,S.nKinderen);
+  renderChildAges();
+  document.getElementById('opvangCard').style.display=S.nKinderen>0?'':'none';
+  updateUI();
+}
+function renderChildAges(){
+  const c=document.getElementById('childAges');
+  c.innerHTML='';
+  for(let i=0;i<S.nKinderen;i++){
+    const row=document.createElement('div');
+    row.className='child-age-row';
+    row.innerHTML=`<span class="child-age-lbl">Kind ${i+1}</span>
+      <select class="child-age-sel" onchange="S.kinderLeeftijden[${i}]=parseInt(this.value);updateUI()">
+        ${Array.from({length:18},(_,a)=>`<option value="${a}"${S.kinderLeeftijden[i]===a?' selected':''}>${a} jaar</option>`).join('')}
+      </select>`;
+    c.appendChild(row);
+  }
+}
+
+// ── UI refresh ───────────────────────────────────────────────────
+function updateUI(){updateSituatie_ui();}
+function updateSituatie_ui(){
+  const w=document.getElementById('woonsituatie').value;
+  document.getElementById('huurwrap').style.display=w==='huur'?'':'none';
+}
+
+// ── Formatters ───────────────────────────────────────────────────
+const eur=(v,dec=0)=>'€\u00A0'+Math.round(v).toLocaleString('nl-NL',{minimumFractionDigits:dec,maximumFractionDigits:dec});
+
+// ── CALCULATION ENGINE ───────────────────────────────────────────
+function calcAll(){
+  const ink1 = parseFloat(document.getElementById('inkomen1').value)||0;
+  const ink2 = S.situatie==='partner'?(parseFloat(document.getElementById('inkomen2').value)||0):0;
+  const totInk = ink1+ink2;
+  const leeftijd = parseInt(document.getElementById('leeftijd').value)||27;
+  const woonsit = document.getElementById('woonsituatie').value;
+  const huur = parseFloat(document.getElementById('huur').value)||0;
+  const zorgpremie = parseFloat(document.getElementById('zorgpremie').value)||0;
+
+  const results=[];
+
+  // ── 1. ZORGTOESLAG ──────────────────────────────────────────────
+  // 2026: max €154/mnd single, €263/mnd partner | grens ~€37.496 / ~€47.368
+  let zorgtoeslag=0,zorgElig=false;
+  if(S.zorgverzekerd==='ja' && leeftijd>=18){
+    const maxZorg=S.situatie==='partner'?3156:1848; // jaar
+    const grensZorg=S.situatie==='partner'?47368:37496;
+    if(totInk<=grensZorg){
+      const afbouw=S.situatie==='partner'?0.1368:0.1368;
+      zorgtoeslag=Math.max(0,maxZorg-(Math.max(0,totInk-0)*afbouw));
+      zorgtoeslag=Math.min(zorgtoeslag,maxZorg);
+      zorgElig=zorgtoeslag>0;
+    }
+  }
+  results.push({
+    id:'zorg',name:'Zorgtoeslag',icon:'🏥',
+    mnd:zorgtoeslag/12,jaar:zorgtoeslag,
+    elig:zorgElig,
+    desc:'Bijdrage in de kosten van je basisverzekering',
+    color:'#f97316',colorBg:'rgba(249,115,22,.08)',colorBorder:'rgba(249,115,22,.18)',
+    note:zorgElig?`Inkomen: ${eur(totInk)} · Grens: ${eur(S.situatie==='partner'?47368:37496)}`:'Inkomen te hoog of geen verzekering'
+  });
+
+  // ── 2. HUURTOESLAG ──────────────────────────────────────────────
+  // 2026: max huur €808.06 | inkomensgrens ~€20.400 (1p) / ~€27.600 (2p)
+  let huurtoeslag=0,huurElig=false;
+  if(woonsit==='huur' && huur>0 && leeftijd>=18){
+    const huurMax=808.06;
+    const huurMin=S.situatie==='partner'?442.46:442.46;
+    const grensHuur=S.situatie==='partner'?27624:20424;
+    const normhuur=S.situatie==='partner'?635.05:635.05;
+    if(huur>=huurMin && huur<=huurMax && totInk<=grensHuur){
+      // Basishuur aftrek
+      const basisbijdrage = Math.max(0, huur - normhuur);
+      const inkomensFactor = Math.max(0, 1 - (totInk / grensHuur));
+      // Simple approximation: max ~€600/mnd at low income
+      const maxHuur = S.situatie==='partner' ? 440 : 420;
+      huurtoeslag = Math.max(0, maxHuur * inkomensFactor * Math.min(1, huur/650));
+      huurElig = huurtoeslag > 5;
+    }
+  }
+  results.push({
+    id:'huur',name:'Huurtoeslag',icon:'🏠',
+    mnd:huurElig?huurtoeslag:0,jaar:huurElig?huurtoeslag*12:0,
+    elig:huurElig,
+    desc:'Bijdrage in de huurkosten van uw woning',
+    color:'#06d6a0',colorBg:'rgba(6,214,160,.08)',colorBorder:'rgba(6,214,160,.18)',
+    note:huurElig?`Huur: ${eur(huur)}/mnd · Max: €808`:(woonsit==='koop'?'Alleen voor huurwoningen':totInk>=(S.situatie==='partner'?27624:20424)?'Inkomen te hoog':'Huur buiten de grenzen')
+  });
+
+  // ── 3. KINDERBIJSLAG ────────────────────────────────────────────
+  // 2026: Per kwartaal: 0-5j=€270,35 · 6-11j=€327,56 · 12-17j=€384,77
+  let kinderbijslag=0;
+  if(S.nKinderen>0){
+    S.kinderLeeftijden.forEach(a=>{
+      if(a<=5) kinderbijslag+=270.35*4;
+      else if(a<=11) kinderbijslag+=327.56*4;
+      else if(a<=17) kinderbijslag+=384.77*4;
+    });
+  }
+  results.push({
+    id:'bijslag',name:'Kinderbijslag',icon:'👶',
+    mnd:kinderbijslag/12,jaar:kinderbijslag,
+    elig:kinderbijslag>0,
+    desc:'Bijdrage in de kosten voor uw kinderen (SVB)',
+    color:'#a3e635',colorBg:'rgba(163,230,53,.08)',colorBorder:'rgba(163,230,53,.18)',
+    note:kinderbijslag>0?`${S.nKinderen} kind${S.nKinderen>1?'eren':''} · Leeftijdsafhankelijk`:'Geen kinderen opgegeven'
+  });
+
+  // ── 4. KINDGEBONDEN BUDGET ──────────────────────────────────────
+  // 2026: 1e kind max €1.498/jr, 2e kind +€864, elk volgend +€415
+  // Afgebouwd boven ~€21.180 (single) / ~€36.500 (partner) met 6,75%
+  let kgb=0;
+  const grensKgb=S.situatie==='partner'?36500:21180;
+  if(S.nKinderen>0 && totInk<=grensKgb+22200){
+    let maxKgb=0;
+    if(S.nKinderen>=1) maxKgb+=1498;
+    if(S.nKinderen>=2) maxKgb+=864;
+    if(S.nKinderen>=3) maxKgb+=(S.nKinderen-2)*415;
+    // Extra voor kind >12
+    S.kinderLeeftijden.forEach(a=>{ if(a>=12&&a<=17) maxKgb+=767; });
+    const afbouwKgb=Math.max(0,(totInk-grensKgb)*0.0675);
+    kgb=Math.max(0,maxKgb-afbouwKgb);
+  }
+  results.push({
+    id:'kgb',name:'Kindgebonden Budget',icon:'💰',
+    mnd:kgb/12,jaar:kgb,
+    elig:kgb>0,
+    desc:'Inkomensafhankelijke bijdrage voor gezinnen met kinderen',
+    color:'#a78bfa',colorBg:'rgba(167,139,250,.08)',colorBorder:'rgba(167,139,250,.18)',
+    note:kgb>0?`${S.nKinderen} kind${S.nKinderen>1?'eren':''} · Inkomensafhankelijk`:'Geen kinderen of inkomen te hoog'
+  });
+
+  // ── 5. KINDEROPVANGTOESLAG ──────────────────────────────────────
+  // 2026 max uurprijzen: dagopvang €9.12, BSO €7.84, gastouder €6.97
+  // Vergoedingspercentage inkomensafhankelijk (0%–96%)
+  let kot=0;
+  const maxUurtarieven={dagopvang:9.12,bso:7.84,gastouder:6.97};
+  if(S.nKinderen>0 && S.opvang==='ja'){
+    const uren=parseFloat(document.getElementById('opvangUren').value)||120;
+    const tarief=parseFloat(document.getElementById('opvangTarief').value)||9.12;
+    const type=document.getElementById('opvangType').value;
+    const maxTarief=maxUurtarieven[type];
+    const effectiefTarief=Math.min(tarief,maxTarief);
+    // Vergoedingspercentage 2026 op basis van toetsingsinkomen
+    let vergPct=0;
+    if(totInk<=19837) vergPct=0.96;
+    else if(totInk<=24524) vergPct=0.96-(totInk-19837)*0.000034;
+    else if(totInk<=32438) vergPct=0.8;
+    else if(totInk<=47699) vergPct=0.8-(totInk-32438)*0.0000196;
+    else if(totInk<=74174) vergPct=0.5;
+    else if(totInk<=129687) vergPct=0.5-(totInk-74174)*0.0000468;
+    else vergPct=Math.max(0.33,0.5-(totInk-74174)*0.0000468);
+    vergPct=Math.max(0,Math.min(0.96,vergPct));
+    // Max 230 uur/mnd per kind voor eerste kind
+    const maxUrenMnd=230;
+    const gekopteUren=Math.min(uren,maxUrenMnd);
+    const kosten=gekopteUren*effectiefTarief;
+    kot=kosten*vergPct*S.nKinderen;
+  }
+  results.push({
+    id:'kot',name:'Kinderopvangtoeslag',icon:'🏫',
+    mnd:kot,jaar:kot*12,
+    elig:kot>0,
+    desc:'Vergoeding voor professionele kinderopvang',
+    color:'#3b82f6',colorBg:'rgba(59,130,246,.08)',colorBorder:'rgba(59,130,246,.18)',
+    note:kot>0?`Vergoeding: ${Math.round((kot/(parseFloat(document.getElementById('opvangUren').value||120)*parseFloat(document.getElementById('opvangTarief').value||9.12)))*100)}% van opvangkosten`:(S.nKinderen===0?'Geen kinderen opgegeven':S.opvang==='nee'?'Geen opvang opgegeven':'Inkomen te hoog of uren/tarief niet ingevuld')
+  });
+
+  // ── RENDER ───────────────────────────────────────────────────────
+  const totalMnd=results.reduce((s,r)=>s+r.mnd,0);
+  const totalJaar=results.reduce((s,r)=>s+r.jaar,0);
+  const maxMnd=Math.max(...results.map(r=>r.mnd),1);
+
+  document.getElementById('totalMnd').textContent=Math.round(totalMnd).toLocaleString('nl-NL');
+  document.getElementById('totalJaar').textContent=eur(totalJaar);
+
+  // Cards
+  const grid=document.getElementById('resGrid');
+  grid.innerHTML=results.map(r=>`
+    <div class="res-card${r.elig?'':' zero'}">
+      <div class="res-card-top">
+        <div class="elig ${r.elig?'yes':'no'}">${r.elig?'Recht op':'Geen recht'}</div>
+        <div class="res-card-icon" style="background:${r.colorBg};border-color:${r.colorBorder}">${r.icon}</div>
+        <div class="res-card-name">${r.name}</div>
+        <div class="res-card-desc">${r.desc}</div>
+      </div>
+      <div class="res-card-bottom">
+        <div class="res-card-amount" style="color:${r.elig?r.color:'rgba(237,235,245,.2)'}">${r.elig?eur(r.mnd):'€ —'}</div>
+        <div class="res-card-per">${r.elig?'per maand':r.note}</div>
+        <div class="res-card-bar"><div class="res-card-bar-fill" style="width:0%;background:${r.color}" data-w="${r.elig?(r.mnd/maxMnd*100):0}"></div></div>
+      </div>
+    </div>`).join('');
+
+  // Breakdown table
+  const bRows=document.getElementById('breakdownRows');
+  bRows.innerHTML=results.map(r=>`
+    <div class="breakdown-row">
+      <div class="breakdown-name">${r.icon}&nbsp;${r.name}</div>
+      <div class="breakdown-right">
+        <div class="breakdown-month" style="color:${r.elig?r.color:'rgba(237,235,245,.2)'}">${r.elig?eur(r.mnd):'—'}</div>
+        <div class="breakdown-year">${r.elig?eur(r.jaar)+'/jr':'Geen recht'}</div>
+      </div>
+    </div>`).join('')+`
+    <div class="breakdown-row breakdown-total">
+      <div class="breakdown-name">Totaal per maand</div>
+      <div class="breakdown-right">
+        <div class="breakdown-month">${eur(totalMnd)}</div>
+        <div class="breakdown-year">${eur(totalJaar)}/jr</div>
+      </div>
+    </div>`;
+
+  document.getElementById('results').classList.add('show');
+  setTimeout(()=>{
+    document.getElementById('results').scrollIntoView({behavior:'smooth',block:'start'});
+    document.querySelectorAll('.res-card-bar-fill').forEach(el=>{ el.style.transition='width 1.2s cubic-bezier(.4,0,.2,1)'; el.style.width=el.dataset.w+'%'; });
+  },60);
+}
+
+// Initial UI
+updateSituatie_ui();
+document.getElementById('inkomen2wrap').style.display='none';
+</script>
+</body>
+</html>
